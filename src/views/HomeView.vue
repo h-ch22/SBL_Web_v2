@@ -1,18 +1,196 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div>
+    <div id="banner-section">
+      <video
+        id="banner-video"
+        controls-variant="hidden"
+        :src="require('@/assets/Intro_Banner.mp4')"
+        autoplay
+        loop
+        muted
+        ></video>
+
+      <v-btn
+        id="play-pause-button"
+        @click="togglePlayPause"
+        variant="text"
+        color="white"
+      >
+        <font-awesome-icon
+          v-if="isPlaying"
+          icon="fa-solid fa-pause-circle"
+        ></font-awesome-icon>
+
+        <font-awesome-icon
+          v-else
+          icon="fa-solid fa-play-circle"
+        ></font-awesome-icon>
+      </v-btn>
+    </div>
+
+    <v-container class="mt-2">
+      <div
+        class="text-h4 font-weight-medium center-aligned-div"
+        :style="{
+          color: theme.current.value.colors.primary
+        }"
+      >SBL TODAY</div>
+
+      <div class="news-scroll-row">
+        <div v-for="news in newsList" :key="news.id">
+          <v-card class="ml-3 mt-2 elevation-2 rounded-xl" :style="{ width: '250px' }">
+            <v-card-title>
+              <v-img
+                :src="news.image"
+                width="200px"
+                height="300px"/>
+
+                {{ news.title }}
+            </v-card-title>
+            <v-card-subtitle> {{ news.date }} </v-card-subtitle>
+          </v-card>
+        </div>
+      </div>
+
+      <div class="center-aligned-div mt-2">
+        <v-btn variant="tonal">Show All</v-btn>
+      </div>
+
+      <div
+        class="text-h4 font-weight-medium center-aligned-div mt-4"
+        :style="{
+          color: theme.current.value.colors.primary
+        }"
+      >LATEST PUBLICATIONS
+      </div>
+
+      <div v-for="pub in publicationList" :key="pub.id">
+        <div class="mb-2" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
+          <div class="ml-2">
+            {{ pub.contents }}
+          </div>
+
+          <v-btn variant="text">
+            <font-awesome-icon icon="fa-solid fa-link" class="mr-1"/>
+          </v-btn>
+        </div>
+      </div>
+
+      <div class="center-aligned-div mt-2">
+        <v-btn variant="tonal">Show All</v-btn>
+      </div>
+
+    </v-container>
   </div>
+
 </template>
 
-<script lang="ts">
-import { Options, Vue } from 'vue-class-component'
-import HelloWorld from '@/components/HelloWorld.vue' // @ is an alias to /src
+<style>
+#banner-section {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+}
 
-@Options({
-  components: {
-    HelloWorld
+#banner-section video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.9);
+}
+
+#play-pause-button {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  left: 50%;
+  top: 75vh;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+}
+
+.news-scroll-row {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+}
+
+.center-aligned-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
+
+<script setup lang="ts">
+import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
+import { ref, onMounted } from 'vue'
+import { useTheme } from 'vuetify'
+import { firestore as db } from '@/main'
+import { News } from '@/types/News'
+import { Publication } from '@/types/Publication'
+const theme = useTheme()
+
+const isPlaying = ref(true)
+
+let videoElement: HTMLVideoElement | null = null
+const newsQuery = query(collection(db, 'News'), orderBy('date', 'desc'), limit(5))
+const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'), limit(5))
+const newsList = ref<News[]>([])
+const publicationList = ref<Publication[]>([])
+
+onMounted(() => {
+  videoElement = document.getElementById('banner-video') as HTMLVideoElement
+  if (videoElement) {
+    videoElement.addEventListener('play', () => { isPlaying.value = true })
+    videoElement.addEventListener('pause', () => { isPlaying.value = false })
   }
+
+  getDocs(newsQuery)
+    .then((docs) => {
+      docs.forEach((doc) => {
+        newsList.value.push({
+          id: doc.id,
+          contents: doc.data().contents,
+          date: doc.data().date,
+          image: doc.data().image,
+          title: doc.data().title
+        })
+      })
+    })
+    .catch((e: Error) => {
+      console.log(e.message)
+    })
+
+  getDocs(publicationsQuery)
+    .then((docs) => {
+      docs.forEach((doc) => {
+        publicationList.value.push({
+          id: doc.id,
+          contents: doc.data().contents,
+          link: doc.data().link,
+          type: doc.data().type,
+          year: doc.data().year
+        })
+      })
+    })
+    .catch((e: Error) => {
+      console.log(e.message)
+    })
 })
-export default class HomeView extends Vue {}
+
+function togglePlayPause () {
+  if (!videoElement) return
+  if (videoElement.paused) {
+    videoElement.play()
+  } else {
+    videoElement.pause()
+  }
+}
 </script>

@@ -1,0 +1,48 @@
+rules_version = '2';
+
+// Craft rules based on data in your Firestore database
+// allow write: if firestore.get(
+//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+service firebase.storage {
+  match /b/{bucket}/o {
+		match /News/{postId}/{fileId}{
+    	allow read: if true;
+    	allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /awards/{postId}/{fileId}{
+      allow read: if true;
+    	allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /banners/{fileId}{
+    	allow read: if true;
+      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /contact/{fileId}{
+      allow read: if true;
+      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /gallery/{postId}/{fileId}{
+      allow read: if true;
+      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /members/img/{fileId}{
+      allow read: if true;
+      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /research/{fileId}{
+      allow read: if true;
+      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /symbols/{fileId}{
+          allow read: if true;
+      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+  }
+}

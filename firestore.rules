@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      match /Members/{docId}{
+      allow read: if true;
+      allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+      match /Coarses/{docId}{
+      allow read: if true;
+      allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+
+      match /Contact/{docId}{
+        allow read: if true;
+        allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+      match /Publications/{docId}{
+      allow read: if true;
+			allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+      match /Users/{uid}{
+      allow read, write, update, create, delete, update: if false;
+      }
+      
+      match /Banners/{docId}{
+      allow read: if true;
+			allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+			match /Gallery/{docId}{
+      allow read: if true;
+			allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+      match /Awards/{docId}{
+      allow read: if true;
+			allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+      match /News/{docId}{
+      allow read: if true;
+			allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+      match /Projects/{docId}{
+      allow read: if true;
+      allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+      match /Research/{docId}{
+      allow read: if true;
+      allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+
+      }
+      
+      match /Symbols/{docId}{
+        allow read: if true;
+      	allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+    }
+  }
+}
