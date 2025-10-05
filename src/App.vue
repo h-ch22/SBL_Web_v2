@@ -1,8 +1,10 @@
 <template>
   <v-app>
-      <v-app-bar app color="background">
+      <v-app-bar app color="transparent" style="backdrop-filter: blur(2px)">
         <v-toolbar-title>
           <v-img
+            class="home-btn"
+            @click="router.push({ name: 'home' })"
             :src="require(theme.current.value.dark ? '@/assets/SBL_Traditional_Symbol_Horizontal_English_White.svg' : '@/assets/SBL_Traditional_Symbol_Horizontal_English_Black.svg')"
             contain
             width="300"
@@ -20,7 +22,7 @@
             <font-awesome-icon icon="fa-solid fa-right-from-bracket"/>
           </v-btn>
 
-          <v-btn variant="plain" @click="theme.toggle();">
+          <v-btn variant="plain" @click="switchTheme()">
             <font-awesome-icon
               v-if="theme.current.value.dark"
               icon="fa-solid fa-sun"
@@ -46,7 +48,7 @@
         <div
           v-if="showMenu"
           class="overlay-menu rounded-xl elevation-14 opacity-90"
-          :style="{ background: theme.current.value.colors.background }"
+          :style="{ background: theme.current.value.colors.background, backdropFilter: 'blur(5px)' }"
         >
           <v-row>
             <v-col v-for="item in menuItems" :key="item.title">
@@ -62,58 +64,72 @@
         </div>
       </transition>
 
-        <div
-          v-if="showSignIn"
-          class="signin-menu rounded-xl elevation-14 opacity-90"
-          :style="{
-            background: theme.current.value.colors.background,
-            width: detectMobile() ? '80vw' : '25vw'
-          }"
-        >
-          <v-col>
-            <v-text-field
-              class="sign-in-field"
-              v-model="email"
-              label="E-Mail"
-              type="email"
-              prepend-icon="mdi-email"
-              color="primary"
-              :style="{ width: detectMobile() ? '70vw' : '22vw' }"
-            ></v-text-field>
+      <div
+        v-if="showSignIn"
+        class="signin-menu rounded-xl elevation-14 opacity-90"
+        :style="{
+          background: theme.current.value.colors.background,
+          width: detectMobile() ? '80vw' : '25vw',
+          backdropFilter: 'blur(5px)'
+        }"
+      >
+        <v-col>
+          <v-text-field
+            class="sign-in-field"
+            v-model="email"
+            label="E-Mail"
+            type="email"
+            prepend-icon="mdi-email"
+            color="primary"
+            :style="{ width: detectMobile() ? '70vw' : '22vw' }"
+          ></v-text-field>
 
-            <v-text-field
-              class="sign-in-field"
-              v-model="password"
-              label="Password"
-              type="password"
-              prepend-icon="mdi-key"
-              color="primary"
-              :style="{ width: detectMobile() ? '70vw' : '22vw' }"
-            ></v-text-field>
+          <v-text-field
+            class="sign-in-field"
+            v-model="password"
+            label="Password"
+            type="password"
+            prepend-icon="mdi-key"
+            color="primary"
+            :style="{ width: detectMobile() ? '70vw' : '22vw' }"
+          ></v-text-field>
 
-            <v-btn variant="tonal" @click="signIn">Sign In</v-btn>
-          </v-col>
-        </div>
+          <v-btn variant="tonal" @click="signIn">Sign In</v-btn>
+        </v-col>
+      </div>
 
-    </v-main>
+      </v-main>
     </v-layout>
 
-      <v-footer color="#363636">
-        <v-container>
-          <v-row>
-            <v-col class="footer-text">
-              <p>tsgo@jbnu.ac.kr</p>
-              <p>337, College of Engineering Building 1, Jeonbuk National University, 567, Baekje-daero, Deokjin-gu, Jeonju-si, Jeonbuk State 54896 Republic of Korea</p>
-              <p>&copy; 2022-2025 Jeonbuk National University Smart Biophotonics Lab. All rights reserved.</p>
-              <p>Developed by <span :href="'https://github.com/h-ch22'">Changjin Ha</span></p>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-footer>
+    <v-footer color="#363636">
+      <v-container>
+        <v-row>
+          <v-col class="footer-text">
+            <p>tsgo@jbnu.ac.kr</p>
+            <p>337, College of Engineering Building 1, Jeonbuk National University, 567, Baekje-daero, Deokjin-gu, Jeonju-si, Jeonbuk State 54896 Republic of Korea</p>
+            <p>&copy; 2022-2025 Jeonbuk National University Smart Biophotonics Lab. All rights reserved.</p>
+            <p>Developed by <span :href="'https://github.com/h-ch22'">Changjin Ha</span></p>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-footer>
   </v-app>
 </template>
 
 <style>
+v-main {
+  min-height: 100vh;
+}
+
+v-footer {
+  bottom: 0;
+  position: sticky;
+}
+
+.home-btn:hover {
+  cursor: pointer;
+}
+
 .menuBtn {
   display: flex;
   flex-direction: column;
@@ -170,8 +186,9 @@
 </style>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
+import { useRouter } from 'vue-router'
 import { auth } from './main'
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth'
 
@@ -179,6 +196,7 @@ const theme = useTheme()
 const showMenu = ref(false)
 const showSignIn = ref(false)
 const isSignedIn = ref(false)
+const router = useRouter()
 
 const menuItems = ref([
   {
@@ -202,11 +220,6 @@ const menuItems = ref([
     icon: 'fa-magnifying-glass'
   },
   {
-    href: 'projects',
-    title: 'Projects',
-    icon: 'fa-project-diagram'
-  },
-  {
     href: 'lectures',
     title: 'Lectures',
     icon: 'fa-chalkboard-teacher'
@@ -225,6 +238,11 @@ const menuItems = ref([
     href: 'contact',
     title: 'Contact',
     icon: 'fa-phone'
+  },
+  {
+    href: 'downloads',
+    title: 'Downloads',
+    icon: 'fa-download'
   }
 ])
 
@@ -233,6 +251,11 @@ const password = ref('')
 
 function detectMobile () {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
+function switchTheme () {
+  theme.toggle()
+  localStorage.setItem('theme', theme.current.value.dark ? 'dark' : 'light')
 }
 
 function signIn () {
@@ -274,11 +297,25 @@ watch(showSignIn, (newVal) => {
   }
 })
 
+onkeyup = (e: KeyboardEvent) => {
+  if (e.key === 'Enter' && showSignIn.value) {
+    signIn()
+  }
+}
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
     isSignedIn.value = true
   } else {
     isSignedIn.value = false
+  }
+})
+
+onMounted(() => {
+  if (localStorage.getItem('theme') === 'dark' && !theme.current.value.dark) {
+    switchTheme()
+  } else if (localStorage.getItem('theme') === 'light' && theme.current.value.dark) {
+    switchTheme()
   }
 })
 

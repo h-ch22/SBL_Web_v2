@@ -30,7 +30,19 @@ import {
   faEnvelope,
   faKey,
   faRightFromBracket,
-  faLink
+  faLink,
+  faAdd,
+  faGraduationCap,
+  faStar,
+  faUserTie,
+  faIdCardClip,
+  faDownload,
+  faTrash,
+  faEdit,
+  faChevronDown,
+  faChevronUp,
+  faLocationPin,
+  faExpand
 } from '@fortawesome/free-solid-svg-icons'
 
 const firebaseConfig = {
@@ -62,7 +74,20 @@ library.add(
   faEnvelope,
   faKey,
   faRightFromBracket,
-  faLink
+  faLink,
+  faAdd,
+  faGraduationCap,
+  faStar,
+  faUserTie,
+  faIdCardClip,
+  faUser,
+  faDownload,
+  faTrash,
+  faEdit,
+  faChevronDown,
+  faChevronUp,
+  faLocationPin,
+  faExpand
 )
 
 loadFonts()

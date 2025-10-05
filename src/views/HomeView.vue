@@ -30,7 +30,7 @@
 
     <v-container class="mt-2">
       <div
-        class="text-h4 font-weight-medium center-aligned-div"
+        class="text-h4 font-weight-medium center-aligned-div mb-2"
         :style="{
           color: theme.current.value.colors.primary
         }"
@@ -38,7 +38,7 @@
 
       <div class="news-scroll-row">
         <div v-for="news in newsList" :key="news.id">
-          <v-card class="ml-3 mt-2 elevation-2 rounded-xl" :style="{ width: '250px' }">
+          <v-card class="ml-3 mt-2 pa-2 rounded-xl" variant="outlined" :style="{ width: '250px' }">
             <v-card-title>
               <v-img
                 :src="news.image"
@@ -57,7 +57,7 @@
       </div>
 
       <div
-        class="text-h4 font-weight-medium center-aligned-div mt-4"
+        class="text-h4 font-weight-medium center-aligned-div mt-6 mb-2"
         :style="{
           color: theme.current.value.colors.primary
         }"
@@ -78,6 +78,57 @@
 
       <div class="center-aligned-div mt-2">
         <v-btn variant="tonal">Show All</v-btn>
+      </div>
+
+      <div
+        class="text-h4 font-weight-medium center-aligned-div mt-6 mb-2"
+        :style="{
+          color: theme.current.value.colors.primary
+        }"
+      >CONTACT
+      </div>
+
+      <div v-if="phone !== ''" class="mb-2" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
+        <div :style="{ display: 'flex', flexDirection: 'row', alignContent: 'flex-start', alignItems: 'center' }">
+          <font-awesome-icon icon="fa-solid fa-phone"/>
+          <div class="ml-2">
+            {{ phone }}
+          </div>
+        </div>
+
+        <v-btn variant="text">
+          <font-awesome-icon icon="fa-solid fa-phone" class="mr-1"/>
+        </v-btn>
+      </div>
+
+      <div v-if="email !== ''" class="mb-2" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
+        <div :style="{ display: 'flex', flexDirection: 'row', alignContent: 'flex-start', alignItems: 'center' }">
+          <font-awesome-icon icon="fa-solid fa-envelope"/>
+          <div class="ml-2">
+            {{ email }}
+          </div>
+        </div>
+
+        <v-btn variant="text">
+          <font-awesome-icon icon="fa-solid fa-envelope" class="mr-1"/>
+        </v-btn>
+      </div>
+
+      <div v-if="address !== ''" class="mb-2" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
+        <div :style="{ display: 'flex', flexDirection: 'row', alignContent: 'flex-start', alignItems: 'center' }">
+          <font-awesome-icon icon="fa-solid fa-location-pin"/>
+          <div class="ml-2">
+            {{ address }}
+          </div>
+        </div>
+
+        <v-btn variant="text">
+          <font-awesome-icon icon="fa-solid fa-location-pin" class="mr-1"/>
+        </v-btn>
+      </div>
+
+      <div class="center-aligned-div mt-2">
+        <v-btn variant="tonal">Details</v-btn>
       </div>
 
     </v-container>
@@ -129,7 +180,7 @@
 </style>
 
 <script setup lang="ts">
-import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
+import { collection, doc, DocumentSnapshot, getDocs, getDoc, limit, orderBy, query } from 'firebase/firestore'
 import { ref, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
 import { firestore as db } from '@/main'
@@ -142,8 +193,13 @@ const isPlaying = ref(true)
 let videoElement: HTMLVideoElement | null = null
 const newsQuery = query(collection(db, 'News'), orderBy('date', 'desc'), limit(5))
 const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'), limit(5))
+const contactRef = doc(db, 'Contact', 'Introduction')
+
 const newsList = ref<News[]>([])
 const publicationList = ref<Publication[]>([])
+const phone = ref('')
+const email = ref('')
+const address = ref('')
 
 onMounted(() => {
   videoElement = document.getElementById('banner-video') as HTMLVideoElement
@@ -179,6 +235,19 @@ onMounted(() => {
           year: doc.data().year
         })
       })
+    })
+    .catch((e: Error) => {
+      console.log(e.message)
+    })
+
+  getDoc(contactRef)
+    .then((doc: DocumentSnapshot) => {
+      if (doc.exists()) {
+        const data = doc.data()
+        phone.value = data.tel
+        email.value = data.email
+        address.value = data.address
+      }
     })
     .catch((e: Error) => {
       console.log(e.message)
