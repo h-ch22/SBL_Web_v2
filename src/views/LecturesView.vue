@@ -1,17 +1,29 @@
 <template>
   <div style="top: 72px; margin-bottom: 72px; position: relative;">
     <v-container>
-      <div>
+      <div :style="{
+          minHeight: '100vh'
+      }">
         <div>
           <HeaderComponent
             :title="'Lectures'"
           />
         </div>
 
+        <v-text-field
+            class="mt-5"
+            v-model="searchText"
+            label="Search Lectures"
+            color="primary"
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+            :style="{ maxWidth: '100vw' }"
+        ></v-text-field>
+
         <div
           :style="{
             display: 'flex',
-            justifyContent: 'center'
+            justifyContent: 'center',
           }">
             <v-progress-circular
               v-if="isLoading"
@@ -31,7 +43,7 @@
                     v-for="year in yearsList"
                     :key="year">
                       <v-chip
-                        v-if="selectedYear === year"
+                        v-if="selectedYear === year && searchText === ''"
                         prepend-icon="mdi-check"
                         variant="tonal"
                         color="primary"
@@ -44,6 +56,7 @@
                         @click="selectedYear = year"
                         variant="tonal"
                         class="rounded-pill"
+                        :disabled="searchText !== ''"
                         >
                         {{ year }}
                       </v-chip>
@@ -62,7 +75,7 @@
                     v-for="semester in semestersList"
                     :key="semester">
                       <v-chip
-                        v-if="selectedSemester === semester"
+                        v-if="selectedSemester === semester && searchText === ''"
                         prepend-icon="mdi-check"
                         variant="tonal"
                         color="primary"
@@ -75,7 +88,7 @@
                         @click="selectedSemester = semester"
                         variant="tonal"
                         class="rounded-pill"
-                        :disabled="lecturesList.filter(lect => lect.semester === semester && lect.year === selectedYear).length === 0"
+                        :disabled="lecturesList.filter(lect => lect.semester === semester && lect.year === selectedYear).length === 0 || searchText !== ''"
                         >
                         {{ semester }}
                       </v-chip>
@@ -173,6 +186,7 @@ const selectedYear = ref('')
 const semestersList = ref<string[]>(['Spring', 'Summer', 'Fall', 'Winter'])
 const selectedSemester = ref('Spring')
 const isLoading = ref(false)
+const searchText = ref('')
 
 function filterLectures () {
   filteredLectures.value = lecturesList.value.filter(lect => {
@@ -201,6 +215,15 @@ function getLectures () {
 
 watch([selectedSemester, selectedYear], () => {
   filterLectures()
+})
+
+watch(searchText, () => {
+  if (searchText.value === '') {
+    filterLectures()
+  } else {
+    const searchLower = searchText.value.toLowerCase()
+    filteredLectures.value = lecturesList.value.filter(lect => lect.title.toLowerCase().includes(searchLower))
+  }
 })
 
 onMounted(() => {

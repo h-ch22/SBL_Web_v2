@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { auth } from '@/main'
 import HomeView from '../views/HomeView.vue'
 import MembersView from '@/views/MembersView.vue'
 import BoardView from '@/views/BoardView.vue'
@@ -6,6 +7,9 @@ import PublicationsView from '@/views/PublicationsView.vue'
 import LecturesView from '@/views/LecturesView.vue'
 import ContactView from '@/views/ContactView.vue'
 import DownloadsView from '@/views/DownloadsView.vue'
+import CreateMemberView from '@/views/CreateMemberView.vue'
+import CreatePostView from '@/views/CreatePostView.vue'
+import ModifyContactView from '@/views/ModifyContactView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -52,6 +56,36 @@ const routes: Array<RouteRecordRaw> = [
     path: '/contact',
     name: 'contact',
     component: ContactView
+  },
+  {
+    path: '/create-member',
+    name: 'createMember',
+    component: CreateMemberView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/modify-member',
+    name: 'modifyMember',
+    component: CreateMemberView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/create-post',
+    name: 'createPost',
+    component: CreatePostView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/modify-post',
+    name: 'modifyPost',
+    component: CreatePostView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/modify-contact',
+    name: 'modifyContact',
+    component: ModifyContactView,
+    meta: { requiresAuth: true }
   }
 ]
 
@@ -59,5 +93,15 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+// router.beforeEach((to, from, next) => {
+//   if (to.meta.requiresAuth && auth.currentUser === null) {
+//     alert('You must be signed in to access this page.')
+
+//     next('/')
+//   } else {
+//     next(to.path)
+//   }
+// })
 
 export default router

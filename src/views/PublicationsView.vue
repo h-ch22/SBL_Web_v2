@@ -1,12 +1,24 @@
 <template>
   <div style="top: 72px; margin-bottom: 72px; position: relative;">
     <v-container>
-      <div>
+      <div :style="{
+          minHeight: '100vh'
+      }">
         <div>
           <HeaderComponent
             :title="'Publications'"
           />
         </div>
+
+        <v-text-field
+          class="mt-5"
+          v-model="searchText"
+          label="Search Publications"
+          prepend-inner-icon="mdi-magnify"
+          variant="outlined"
+          color="primary"
+          :style="{ maxWidth: '100vw' }"
+        ></v-text-field>
 
         <div
           :style="{
@@ -36,7 +48,7 @@
                     v-for="type in publicationTypes"
                     :key="type">
                     <v-chip
-                      v-if="selectedType === type"
+                      v-if="selectedType === type && searchText === ''"
                       prepend-icon="mdi-check"
                       variant="tonal"
                       color="primary"
@@ -49,6 +61,7 @@
                       @click="selectedType = type"
                       variant="tonal"
                       class="rounded-pill"
+                      :disabled="searchText !== ''"
                     >
                       {{ type }}
                     </v-chip>
@@ -74,7 +87,7 @@
                     </div>
 
                     <div :style="{ display: 'flex', flexDirection: 'row', flexShrink: 0 }">
-                      <v-btn variant="tonal">
+                      <v-btn variant="tonal" :href="pub.link">
                         <font-awesome-icon icon="fa-solid fa-link"/>
                       </v-btn>
 
@@ -113,6 +126,7 @@ const publicationTypes = ref([
 ])
 const selectedType = ref('Intl_Journals')
 const isLoading = ref(true)
+const searchText = ref('')
 
 function filterPublications () {
   filteredPublications.value = publicationsList.value.filter(pub => pub.type === selectedType.value)
@@ -134,5 +148,14 @@ onMounted(() => {
 
 watch(selectedType, () => {
   filterPublications()
+})
+
+watch(searchText, () => {
+  if (searchText.value === '') {
+    filterPublications()
+  } else {
+    const searchLower = searchText.value.toLowerCase()
+    filteredPublications.value = publicationsList.value.filter(pub => pub.contents.toLowerCase().includes(searchLower))
+  }
 })
 </script>

@@ -94,7 +94,12 @@
             :style="{ width: detectMobile() ? '70vw' : '22vw' }"
           ></v-text-field>
 
-          <v-btn variant="tonal" @click="signIn">Sign In</v-btn>
+          <v-btn v-if="!showProgress" variant="tonal" @click="signIn">Sign In</v-btn>
+          <v-progress-circular
+            v-else
+            indeterminate
+            color="primary"
+          />
         </v-col>
       </div>
 
@@ -196,6 +201,7 @@ const theme = useTheme()
 const showMenu = ref(false)
 const showSignIn = ref(false)
 const isSignedIn = ref(false)
+const showProgress = ref(false)
 const router = useRouter()
 
 const menuItems = ref([
@@ -264,12 +270,17 @@ function signIn () {
     return
   }
 
+  showProgress.value = true
+
   signInWithEmailAndPassword(auth, email.value, password.value)
     .then(() => {
       showSignIn.value = false
     })
     .catch((error: Error) => {
       alert(`An error occurred while processing sign in.\nPlease check your E-Mail and password, or try again later.\n(${error.message}`)
+    })
+    .finally(() => {
+      showProgress.value = false
     })
 }
 

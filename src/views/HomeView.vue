@@ -53,7 +53,7 @@
       </div>
 
       <div class="center-aligned-div mt-2">
-        <v-btn variant="tonal">Show All</v-btn>
+        <v-btn variant="tonal" @click="router.push('/news')">Show All</v-btn>
       </div>
 
       <div
@@ -70,13 +70,13 @@
             {{ pub.contents }}
           </div>
 
-          <v-btn variant="text">
+          <v-btn variant="text" :href="pub.link">
             <font-awesome-icon icon="fa-solid fa-link" class="mr-1"/>
           </v-btn>
         </div>
       </div>
 
-      <div class="center-aligned-div mt-2">
+      <div class="center-aligned-div mt-2" @click="router.push('/publications')">
         <v-btn variant="tonal">Show All</v-btn>
       </div>
 
@@ -96,7 +96,7 @@
           </div>
         </div>
 
-        <v-btn variant="text">
+        <v-btn variant="text" @click="call">
           <font-awesome-icon icon="fa-solid fa-phone" class="mr-1"/>
         </v-btn>
       </div>
@@ -109,7 +109,7 @@
           </div>
         </div>
 
-        <v-btn variant="text">
+        <v-btn variant="text" @click="mailTo">
           <font-awesome-icon icon="fa-solid fa-envelope" class="mr-1"/>
         </v-btn>
       </div>
@@ -127,7 +127,7 @@
         </v-btn>
       </div>
 
-      <div class="center-aligned-div mt-2">
+      <div class="center-aligned-div mt-2" @click="router.push('/contact')">
         <v-btn variant="tonal">Details</v-btn>
       </div>
 
@@ -186,6 +186,7 @@ import { useTheme } from 'vuetify'
 import { firestore as db } from '@/main'
 import { News } from '@/types/News'
 import { Publication } from '@/types/Publication'
+import router from '@/router'
 const theme = useTheme()
 
 const isPlaying = ref(true)
@@ -261,5 +262,13 @@ function togglePlayPause () {
   } else {
     videoElement.pause()
   }
+}
+
+function call () {
+  document.location.href = `tel:${phone.value}`
+}
+
+function mailTo () {
+  document.location.href = `mailto:${email.value}`
 }
 </script>

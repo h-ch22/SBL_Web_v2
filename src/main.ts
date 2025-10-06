@@ -10,6 +10,7 @@ import { getAnalytics } from 'firebase/analytics'
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 import { getAuth } from 'firebase/auth'
+import { QuillEditor } from '@vueup/vue-quill'
 
 import {
   faMagnifyingGlass,
@@ -42,8 +43,13 @@ import {
   faChevronDown,
   faChevronUp,
   faLocationPin,
-  faExpand
+  faExpand,
+  faCheck,
+  faList,
+  faClipboard,
+  faClipboardCheck
 } from '@fortawesome/free-solid-svg-icons'
+import { faLine } from '@fortawesome/free-brands-svg-icons'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBcxoVyEHrPCEfebnsOOcsUhybG2cp0zwc',
@@ -87,7 +93,12 @@ library.add(
   faChevronDown,
   faChevronUp,
   faLocationPin,
-  faExpand
+  faExpand,
+  faCheck,
+  faLine,
+  faList,
+  faClipboard,
+  faClipboardCheck
 )
 
 loadFonts()
@@ -102,6 +113,7 @@ const auth = getAuth(firebaseApp)
 app.use(router)
 app.use(vuetify)
 app.component('font-awesome-icon', FontAwesomeIcon)
+app.component('QuillEditor', QuillEditor)
 app.mount('#app')
 
 export { analytics, firestore, storage, auth }
