@@ -61,8 +61,9 @@
                 v-model:content="contactItem.contentsDelta"
                 :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
 
-              <v-row class="mt-2 mr-2">
+              <v-row class="mt-2">
                 <v-btn
+                  class="mt-2 mr-2"
                   variant="outlined"
                   v-if="contactItem?.tel !== ''"
                   @click="copyToClipboard('tel')"
