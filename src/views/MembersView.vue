@@ -12,7 +12,8 @@
         <div
           :style="{
             display: 'flex',
-            flexDirection: 'row'
+            flexDirection: 'row',
+            overflowX: 'auto',
           }">
             <div
               class="ml-2"
@@ -20,10 +21,10 @@
               :key="option">
               <v-chip
                 v-if="selectedOption === option && searchText === ''"
-                prepend-icon="mdi-check"
-                variant="tonal"
-                color="primary"
-                class="rounded-pill">
+                  prepend-icon="mdi-check"
+                  variant="tonal"
+                  color="primary"
+                  class="rounded-pill">
                 {{ option }}
               </v-chip>
 

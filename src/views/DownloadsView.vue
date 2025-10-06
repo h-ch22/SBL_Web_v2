@@ -8,31 +8,111 @@
         <HeaderComponent
           :title="'Downloads'"
           :trailing-icon="'fa-solid fa-add'"
+          @on-click="router.push('/create-post')"
         ></HeaderComponent>
       </div>
 
+      <v-text-field
+        class="mt-5"
+        v-model="searchText"
+        label="Search Downloads"
+        color="primary"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        :style="{ maxWidth: '100vw' }"
+      ></v-text-field>
+
+      <div
+        :style="{
+          display: 'flex',
+          flexDirection: 'row',
+      }">
         <div
-          :style="{
-            width: '100vw',
-            display: 'flex',
-            flexDirection: 'row',
-        }">
-          <div
-              v-if="isLoading"
-              :style="{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100vw'
-              }"
-          >
-              <v-progress-circular
-                  indeterminate
-                  color="primary"
-              />
-          </div>
+            v-if="isLoading"
+            :style="{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100vw'
+            }"
+        >
+            <v-progress-circular
+                indeterminate
+                color="primary"
+            />
         </div>
+
+        <div v-else-if="!isLoading && filteredList.length === 0" class="mt-5">
+          <font-awesome-icon icon="fa-solid fa-xmark"/>
+          {{ 'No posts found' }}
+        </div>
+
+        <v-row v-else>
+          <v-col class="mt-5" v-for="item in filteredList" :key="item.id">
+              <div>
+                <v-card class="rounded-xl" variant="outlined">
+                  <v-card-title
+                    class="text-h4 font-weight-medium mt-2"
+                  >
+                  <div :style="{ alignContent: 'center', width: '40vw', maxWidth: '100vw' }" class="text-h5 mt-2">
+                      {{ item.title }}
+                    </div>
+                  </v-card-title>
+
+                  <v-card-subtitle>
+                    {{ item.date }}
+                  </v-card-subtitle>
+
+                  <v-card-text v-if="item.showContents">
+                    <div class="font-weight-medium">{{ item.title }}</div>
+
+                    <QuillEditor
+                      class="mt-2"
+                      v-model:content="item.contentsDelta"
+                      :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+                  </v-card-text>
+
+                  <v-card-actions>
+                    <v-btn @click="item.showContents = !item.showContents" variant="text">
+                      <font-awesome-icon
+                        v-if="!item.showContents"
+                        icon="fa-solid fa-chevron-down"
+                      ></font-awesome-icon>
+                      <font-awesome-icon
+                        v-else
+                        icon="fa-solid fa-chevron-up"
+                      ></font-awesome-icon>
+                    </v-btn>
+
+                    <v-btn variant="text" :href="item.file">
+                      <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
+                    </v-btn>
+
+                    <v-btn v-if="isSignedIn" @click="router.push({
+                        name: 'modifyPost',
+                        state: {
+                          post: {
+                            id: item.id,
+                            contents: item.contents,
+                            title: item.title,
+                            date: item.date,
+                            category: 'Downloads'
+                          }
+                        }
+                      })">
+                      <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
+                    </v-btn>
+
+                    <v-btn v-if="isSignedIn" color="red" @click="deleteItem(item)">
+                      <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
+                    </v-btn>
+                  </v-card-actions>
+              </v-card>
+            </div>
+          </v-col>
+        </v-row>
+      </div>
       </div>
     </v-container>
   </div>
@@ -40,10 +120,82 @@
 
 <script lang="ts" setup>
 import HeaderComponent from '@/components/HeaderComponent.vue'
-import { firestore as db } from '@/main'
-import { getDoc, doc } from 'firebase/firestore'
-import { onMounted, ref } from 'vue'
+import { firestore as db, auth, storage } from '@/main'
+import { Download } from '@/types/Download'
+import { useRouter } from 'vue-router'
+import { deleteDoc, doc, getDocs, query, orderBy, collection } from 'firebase/firestore'
+import { ref as storageRef, deleteObject } from 'firebase/storage'
+import { onMounted, ref, watch } from 'vue'
+import { onAuthStateChanged } from 'firebase/auth'
+import { Delta } from '@vueup/vue-quill'
 
+const router = useRouter()
 const isLoading = ref(true)
+const searchText = ref('')
+const downloadsList = ref<Download[]>([])
+const filteredList = ref<Download[]>([])
+const isSignedIn = ref(false)
+
+function deleteItem (item: Download) {
+  if (confirm(`Are you sure you want to delete post ${item.title}?\nThis action cannot be undone.`)) {
+    isLoading.value = true
+    deleteDoc(doc(db, 'Downloads', item.id as string))
+      .then(() => {
+        if (item.file !== '' && item.file !== undefined && item.file !== null) {
+          deleteObject(storageRef(storage, `downloads/${item.file.split('downloads%2F').pop()?.split('?')[0]}`))
+            .catch((e: Error) => {
+              alert(`An error occurred while deleting file.\nPlease try again later.\n(${e.message})`)
+            })
+            .finally(() => {
+              alert('Post deleted successfully.')
+              downloadsList.value = downloadsList.value.filter(i => i.id !== item.id)
+              filteredList.value = filteredList.value.filter(i => i.id !== item.id)
+              isLoading.value = false
+            })
+        } else {
+          alert('Post deleted successfully.')
+          downloadsList.value = downloadsList.value.filter(i => i.id !== item.id)
+          filteredList.value = filteredList.value.filter(i => i.id !== item.id)
+          isLoading.value = false
+        }
+      })
+      .catch((e: Error) => {
+        alert(`An error occurred while deleting post.\nPlease try again later.\n(${e.message})`)
+        isLoading.value = false
+      })
+  }
+}
+
+onMounted(() => {
+  getDocs(query(collection(db, 'Downloads'), orderBy('date', 'desc')))
+    .then((querySnapshot) => {
+      downloadsList.value = querySnapshot.docs.map((doc) => ({
+        ...(doc.data() as Download),
+        id: doc.id,
+        contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
+        showContents: false
+      }))
+
+      filteredList.value = downloadsList.value
+    })
+    .catch((e: Error) => {
+      console.log(e.message)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+})
+
+onAuthStateChanged(auth, () => {
+  isSignedIn.value = auth.currentUser !== null
+})
+
+watch(searchText, () => {
+  if (searchText.value === '') {
+    filteredList.value = downloadsList.value
+  } else {
+    filteredList.value = downloadsList.value.filter(download => download.title.toLowerCase().includes(searchText.value.toLowerCase()) || (download.contents !== undefined && download.contents.toLowerCase().includes(searchText.value.toLowerCase())))
+  }
+})
 
 </script>

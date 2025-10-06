@@ -48,10 +48,10 @@
                   />
 
                   <v-file-input
-                    v-model="selectedImage"
-                    prepend-icon="mdi-camera"
-                    :label="isEditMode ? 'Change Image' : 'Image'"
-                    accept="image/*"
+                    v-model="selectedFile"
+                    :prepend-icon="selectedCategory === 'Downloads' ? 'mdi-file' : 'mdi-image'"
+                    :label="isEditMode ? `Change ${selectedCategory === 'Downloads' ? 'File' : 'Image'}` : `${selectedCategory === 'Downloads' ? 'File' : 'Image'}`"
+                    :accept="fileAccept"
                     variant="solo-filled"
                   ></v-file-input>
 
@@ -69,7 +69,7 @@
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import { firestore as db, storage } from '@/main'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
@@ -77,7 +77,7 @@ import { CommonBoardCreateRequest } from '@/types/CommonBoardItem'
 import router from '@/router'
 
 const panel = ref([0])
-const selectedImage = ref<File|null>(null)
+const selectedFile = ref<File|null>(null)
 const showProgress = ref(false)
 const contents = ref<Delta|undefined>(undefined)
 const isEditMode = ref(false)
@@ -90,11 +90,13 @@ const postData = ref<CommonBoardCreateRequest>({
 })
 
 const categories = [
-  'Awards', 'Gallery', 'News'
+  'Awards', 'Downloads', 'Gallery', 'News'
 ]
 
+const fileAccept = computed(() => selectedCategory.value === 'Downloads' ? '' : 'image/*')
+
 async function upload () {
-  if (postData.value.title === '' || contents.value === undefined || (!isEditMode.value && selectedImage.value === null)) {
+  if (postData.value.title === '' || contents.value === undefined || (!isEditMode.value && selectedFile.value === null)) {
     alert('Please fill in all required fields.')
   } else {
     showProgress.value = true
@@ -129,20 +131,25 @@ async function upload () {
       docId = docRef.id
     }
 
-    if (selectedImage.value !== null) {
-      const uploadRef = storageRef(storage, `${selectedCategory.value.toLowerCase()}/img/${docId}.${selectedImage.value.name.split('.').pop()}`)
+    if (selectedFile.value !== null) {
+      const uploadRef = storageRef(
+        storage,
+        selectedCategory.value === 'Downloads'
+          ? `${selectedCategory.value.toLocaleLowerCase()}/${selectedFile.value.name}`
+          : `${selectedCategory.value.toLowerCase()}/img/${docId}.${selectedFile.value.name.split('.').pop()}`
+      )
 
-      uploadBytes(uploadRef, selectedImage.value)
+      uploadBytes(uploadRef, selectedFile.value)
         .catch((e: Error) => {
-          alert(`An error occurred while uploading image.\nPlease try again later.\n(${e.message})`)
+          alert(`An error occurred while uploading file.\nPlease try again later.\n(${e.message})`)
           showProgress.value = false
         })
         .then(() => {
           getDownloadURL(uploadRef)
             .then((url) => {
-              updateDoc(doc(db, selectedCategory.value, docId), { image: url })
+              updateDoc(doc(db, selectedCategory.value, docId), { [selectedCategory.value === 'Downloads' ? 'file' : 'image']: url })
                 .catch((e: Error) => {
-                  alert(`An error occurred while saving image URL.\nPlease try again later.\n(${e.message})`)
+                  alert(`An error occurred while saving file URL.\nPlease try again later.\n(${e.message})`)
                 })
                 .then(() => {
                   alert(isEditMode.value ? 'Post modified successfully.' : 'New post created successfully.')
@@ -178,6 +185,8 @@ onMounted(() => {
       selectedCategory.value = 'Gallery'
     } else if (history.state.back === '/news') {
       selectedCategory.value = 'News'
+    } else if (history.state.back === '/downloads') {
+      selectedCategory.value = 'Downloads'
     } else {
       alert('Invalid access.')
       router.back()
