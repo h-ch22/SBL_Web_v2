@@ -7,6 +7,16 @@ service cloud.firestore {
       allow read: if true;
       allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
       }
+
+      match /Downloads/{docId}{
+      allow read: if true;
+      allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
+      
+      match /Member/{docId} {
+      allow read: if true;
+      allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+      }
       
       match /Coarses/{docId}{
       allow read: if true;

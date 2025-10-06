@@ -91,7 +91,7 @@
                         <font-awesome-icon icon="fa-solid fa-link"/>
                       </v-btn>
 
-                      <div v-if="auth.currentUser !== null">
+                      <div v-if="isSignedIn">
                         <v-btn variant="tonal" class="ml-2">
                           <font-awesome-icon icon="fa-solid fa-edit"/>
                         </v-btn>
@@ -117,6 +117,7 @@ import { ref, onMounted, watch } from 'vue'
 import { firestore as db, auth } from '@/main'
 import { collection, getDocs, orderBy, query } from 'firebase/firestore'
 import { Publication } from '@/types/Publication'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'))
 const publicationsList = ref<Publication[]>([])
@@ -126,6 +127,7 @@ const publicationTypes = ref([
 ])
 const selectedType = ref('Intl_Journals')
 const isLoading = ref(true)
+const isSignedIn = ref(false)
 const searchText = ref('')
 
 function filterPublications () {
@@ -144,6 +146,10 @@ onMounted(() => {
     .finally(() => {
       isLoading.value = false
     })
+})
+
+onAuthStateChanged(auth, () => {
+  isSignedIn.value = auth.currentUser !== null
 })
 
 watch(selectedType, () => {

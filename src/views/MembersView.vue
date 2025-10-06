@@ -121,7 +121,7 @@
                           :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
                       </v-card-text>
 
-                      <v-card-actions v-if="member.website !== '' || member.career !== '' || auth.currentUser !== null">
+                      <v-card-actions v-if="member.website !== '' || member.career !== '' || isSignedIn">
                         <v-btn v-if="member.career !== ''" @click="member.showCareer = !member.showCareer">
                           <font-awesome-icon v-if="member.showCareer" icon="fa-solid fa-chevron-up"/>
                           <font-awesome-icon v-else icon="fa-solid fa-chevron-down"/>
@@ -130,7 +130,7 @@
                           <font-awesome-icon icon="fa-solid fa-link"></font-awesome-icon>
                         </v-btn>
 
-                        <v-btn v-if="auth.currentUser !== null" @click="router.push({
+                        <v-btn v-if="isSignedIn" @click="router.push({
                           name: 'modifyMember',
                           state: {
                             member: {
@@ -151,7 +151,7 @@
                           <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
                         </v-btn>
 
-                        <v-btn v-if="auth.currentUser !== null" color="red" @click="deleteMember(member)">
+                        <v-btn v-if="isSignedIn" color="red" @click="deleteMember(member)">
                           <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
                         </v-btn>
                       </v-card-actions>
@@ -176,6 +176,7 @@ import { useTheme } from 'vuetify/lib/composables/theme'
 import { useRouter } from 'vue-router'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const options = ref([
   'Professor', 'Researcher', 'Student', 'Alumni'
@@ -186,6 +187,7 @@ const members = ref<Member[]>([])
 const filteredMembers = ref<Member[]>([])
 const membersQuery = query(collection(db, 'Members'), orderBy('name'))
 const isLoading = ref(true)
+const isSignedIn = ref(false)
 const theme = useTheme()
 const router = useRouter()
 const searchText = ref('')
@@ -242,6 +244,10 @@ onMounted(() => {
     .finally(() => {
       isLoading.value = false
     })
+})
+
+onAuthStateChanged(auth, () => {
+  isSignedIn.value = auth.currentUser !== null
 })
 
 watch(selectedOption, () => {

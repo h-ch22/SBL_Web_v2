@@ -5,7 +5,7 @@
           <v-img
             class="home-btn"
             @click="router.push({ name: 'home' })"
-            :src="require(theme.current.value.dark ? '@/assets/SBL_Traditional_Symbol_Horizontal_English_White.svg' : '@/assets/SBL_Traditional_Symbol_Horizontal_English_Black.svg')"
+            :src="require(`@/assets/SBL_Traditional_Symbol_Horizontal_English_${theme.current.value.dark ? 'White' : 'Black'}.svg`)"
             contain
             width="300"
             min-width="150">
@@ -113,7 +113,14 @@
             <p>tsgo@jbnu.ac.kr</p>
             <p>337, College of Engineering Building 1, Jeonbuk National University, 567, Baekje-daero, Deokjin-gu, Jeonju-si, Jeonbuk State 54896 Republic of Korea</p>
             <p>&copy; 2022-2025 Jeonbuk National University Smart Biophotonics Lab. All rights reserved.</p>
-            <p>Developed by <span :href="'https://github.com/h-ch22'">Changjin Ha</span></p>
+            <p>Developed by <span class="github_link" @click="goToGithub">Changjin Ha</span></p>
+
+            <v-row class="mt-2">
+                <v-spacer/>
+                <v-img :src="require('@/assets/SBL_Traditional_Symbol_Horizontal_English_Black.svg')"
+                  width="300" max-width="300" class="opacity-50"/>
+            </v-row>
+
           </v-col>
         </v-row>
       </v-container>
@@ -186,6 +193,11 @@ v-footer {
   background: transparent;
   color: white;
   min-width: 250px;
+}
+
+.github_link:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 </style>
@@ -294,6 +306,10 @@ function signOut () {
         alert(`An error occurred while processing sign out.\nPlease try again later.\n(${error.message})`)
       })
   }
+}
+
+function goToGithub () {
+  window.location.href = 'https://github.com/h-ch22'
 }
 
 watch(showMenu, (newVal) => {

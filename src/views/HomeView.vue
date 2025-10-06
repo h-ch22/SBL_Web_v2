@@ -3,11 +3,14 @@
     <div id="banner-section">
       <video
         id="banner-video"
-        controls-variant="hidden"
         :src="require('@/assets/Intro_Banner.mp4')"
         autoplay
         loop
         muted
+        controls="false"
+        playsinline="true"
+        controlslist="nodownload nofullscreen noremoteplayback"
+        webkit-playsinline
         ></video>
 
       <v-btn
@@ -30,7 +33,7 @@
 
     <v-container class="mt-2">
       <div
-        class="text-h4 font-weight-medium center-aligned-div mb-2"
+        class="text-h5 font-weight-bold center-aligned-div mb-2"
         :style="{
           color: theme.current.value.colors.primary
         }"
@@ -57,7 +60,7 @@
       </div>
 
       <div
-        class="text-h4 font-weight-medium center-aligned-div mt-6 mb-2"
+        class="text-h5 font-weight-bold center-aligned-div mt-6 mb-2"
         :style="{
           color: theme.current.value.colors.primary
         }"
@@ -81,7 +84,7 @@
       </div>
 
       <div
-        class="text-h4 font-weight-medium center-aligned-div mt-6 mb-2"
+        class="text-h5 font-weight-bold center-aligned-div mt-6 mb-2"
         :style="{
           color: theme.current.value.colors.primary
         }"
@@ -137,6 +140,15 @@
 </template>
 
 <style>
+video::-webkit-media-controls {
+  display: none !important;
+  opacity: 0;
+}
+
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+}
+
 #banner-section {
   width: 100vw;
   height: 100vh;

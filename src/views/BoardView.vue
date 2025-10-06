@@ -104,7 +104,7 @@
                         <font-awesome-icon icon="fa-solid fa-expand"></font-awesome-icon>
                       </v-btn>
 
-                      <v-btn v-if="auth.currentUser !== null" @click="router.push({
+                      <v-btn v-if="isSignedIn" @click="router.push({
                           name: 'modifyPost',
                           state: {
                             post: {
@@ -119,7 +119,7 @@
                         <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
                       </v-btn>
 
-                      <v-btn v-if="auth.currentUser !== null" color="red" @click="deleteItem(item)">
+                      <v-btn v-if="isSignedIn" color="red" @click="deleteItem(item)">
                         <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
                       </v-btn>
                     </v-card-actions>
@@ -139,6 +139,7 @@ import { firestore as db, auth, storage } from '@/main'
 import { CommonBoardItem } from '@/types/CommonBoardItem'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import { onAuthStateChanged } from 'firebase/auth'
 import { collection, getDocs, query, orderBy, Query, deleteDoc, doc } from 'firebase/firestore'
 import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { onMounted, ref, watch } from 'vue'
@@ -149,6 +150,7 @@ const itemsList = ref<CommonBoardItem[]>([])
 const filteredList = ref<CommonBoardItem[]>([])
 const isLoading = ref(true)
 const searchText = ref('')
+const isSignedIn = ref(false)
 let itemsQuery: Query | undefined
 
 function getRouteName (newRoute: RouteLocationNormalizedLoadedGeneric | undefined = undefined) {
@@ -237,6 +239,10 @@ function deleteItem (item: CommonBoardItem) {
 
 onMounted(() => {
   getItems()
+})
+
+onAuthStateChanged(auth, () => {
+  isSignedIn.value = auth.currentUser !== null
 })
 
 watch(router.currentRoute, () => {

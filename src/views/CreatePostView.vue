@@ -5,9 +5,12 @@
         <div>
           <HeaderComponent
             :title="isEditMode ? 'Modify Post' : 'Create New Post'"
+            :leading-icon="'fa-solid fa-chevron-circle-left'"
+            :show-leading-btn="true"
             :trailing-icon="'fa-solid fa-check'"
             :show-progress="showProgress"
             @on-click="upload"
+            @on-leading-btn-click="router.back()"
           ></HeaderComponent>
         </div>
 

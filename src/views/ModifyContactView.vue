@@ -6,8 +6,11 @@
           <HeaderComponent
             :title="'Modify Contact'"
             :trailing-icon="'fa-solid fa-check'"
+            :leading-icon="'fa-solid fa-chevron-circle-left'"
+            :show-leading-btn="true"
             :show-progress="showProgress"
             @on-click="upload"
+            @on-leading-btn-click="router.back()"
           ></HeaderComponent>
         </div>
 

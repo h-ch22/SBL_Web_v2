@@ -5,9 +5,11 @@
         <div>
           <HeaderComponent
             :title="isEditMode ? 'Modify Member' : 'Create New Member'"
-            :trailing-icon="'fa-solid fa-check'"
+            :show-leading-btn="true"
+            :leading-icon="'fa-solid fa-chevron-circle-left'"
             :show-progress="showProgress"
             @on-click="upload"
+            @on-leading-btn-click="router.back()"
           ></HeaderComponent>
         </div>
 

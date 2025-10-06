@@ -53,7 +53,7 @@
                   alignItems: 'center',
               }"
           >
-              <v-img :src="contactItem?.image" width="90vw" max-width="90vw"/>
+              <v-img :src="contactItem?.image" width="100%" max-width="100%"/>
 
               <QuillEditor
                 v-if="contactItem?.contentsDelta"

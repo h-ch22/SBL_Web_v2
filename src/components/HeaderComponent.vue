@@ -7,10 +7,28 @@
         alignItems: 'center',
         justifyContent: 'space-between',
     }">
-    {{ props.title }}
+
+    <div :style="{
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      verticalAlign: 'middle',
+      alignContent: 'center'
+    }">
+        <v-btn
+            v-if="props.showLeadingBtn"
+            variant="text"
+            @click="emit('on-leading-btn-click')"
+        >
+            <font-awesome-icon :icon="props.leadingIcon" size="2x"/>
+        </v-btn>
+
+        {{ props.title }}
+    </div>
 
     <v-btn
-        v-if="auth.currentUser !== null && props.showTrailingBtn && !props.showProgress"
+        v-if="isSignedIn && props.showTrailingBtn && !props.showProgress"
         variant="tonal"
         @click="emit('on-click')"
     >
@@ -27,11 +45,20 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, ref } from 'vue'
 import { auth } from '@/main'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const props = defineProps({
   title: String,
+  showLeadingBtn: {
+    type: Boolean,
+    default: false
+  },
+  leadingIcon: {
+    type: String,
+    default: 'fa-solid fa-arrow-left'
+  },
   showTrailingBtn: {
     type: Boolean,
     default: true
@@ -46,5 +73,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['on-click'])
+const isSignedIn = ref(false)
+
+const emit = defineEmits(['on-click', 'on-leading-btn-click'])
+
+onAuthStateChanged(auth, () => {
+  isSignedIn.value = auth.currentUser !== null
+})
 </script>

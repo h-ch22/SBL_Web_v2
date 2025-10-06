@@ -6,8 +6,8 @@
     }">
       <div>
         <HeaderComponent
-          :title="'Downloads'"
-          :trailing-icon="'fa-solid fa-add'"
+          :title="'Research'"
+          :trailing-icon="'fa-solid fa-edit'"
         ></HeaderComponent>
       </div>
 

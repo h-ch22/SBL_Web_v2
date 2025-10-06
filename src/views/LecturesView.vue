@@ -121,7 +121,7 @@
                         <font-awesome-icon icon="fa-solid fa-link"/>
                       </v-btn>
 
-                      <div v-if="auth.currentUser !== null">
+                      <div v-if="isSignedIn">
                         <v-btn variant="tonal" class="ml-2">
                           <font-awesome-icon icon="fa-solid fa-edit"/>
                         </v-btn>
@@ -152,7 +152,7 @@
               </div>
 
               <div :style="{ display: 'flex', flexDirection: 'row', flexShrink: 0 }">
-                <div v-if="auth.currentUser !== null">
+                <div v-if="isSignedIn">
                   <v-btn variant="tonal" class="ml-2">
                     <font-awesome-icon icon="fa-solid fa-edit"/>
                   </v-btn>
@@ -165,6 +165,13 @@
             </div>
         </div>
       </div>
+
+      <div class="text-caption" style="display: flex; flex-direction: row; justify-content: center; align-items: center; bottom: 0">
+        {{ 'If you want to check the syllabus and lecture information, please use the Jeonbuk National University course registration system site.' }}
+        <v-btn class="ml-2" variant="text" :href="'https://oasis.jbnu.ac.kr/jbnu/sugang/sbjt/sbjt.html?param=KOR'">
+          <font-awesome-icon icon="fa-solid fa-link"/>
+        </v-btn>
+      </div>
     </v-container>
   </div>
 </template>
@@ -175,6 +182,7 @@ import { ref, onMounted, watch } from 'vue'
 import { firestore as db, auth } from '@/main'
 import { collection, getDocs, orderBy, query } from 'firebase/firestore'
 import { Lecture } from '@/types/Lecture'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const lecturesQuery = query(collection(db, 'Coarses'), orderBy('year', 'desc'))
 const lecturesList = ref<Lecture[]>([])
@@ -187,6 +195,7 @@ const semestersList = ref<string[]>(['Spring', 'Summer', 'Fall', 'Winter'])
 const selectedSemester = ref('Spring')
 const isLoading = ref(false)
 const searchText = ref('')
+const isSignedIn = ref(false)
 
 function filterLectures () {
   filteredLectures.value = lecturesList.value.filter(lect => {
@@ -224,6 +233,10 @@ watch(searchText, () => {
     const searchLower = searchText.value.toLowerCase()
     filteredLectures.value = lecturesList.value.filter(lect => lect.title.toLowerCase().includes(searchLower))
   }
+})
+
+onAuthStateChanged(auth, () => {
+  isSignedIn.value = auth.currentUser !== null
 })
 
 onMounted(() => {

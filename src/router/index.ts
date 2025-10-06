@@ -10,6 +10,8 @@ import DownloadsView from '@/views/DownloadsView.vue'
 import CreateMemberView from '@/views/CreateMemberView.vue'
 import CreatePostView from '@/views/CreatePostView.vue'
 import ModifyContactView from '@/views/ModifyContactView.vue'
+import ResearchView from '@/views/ResearchView.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -31,6 +33,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/news',
     name: 'news',
     component: BoardView
+  },
+  {
+    path: '/research',
+    name: 'research',
+    component: ResearchView
   },
   {
     path: '/publications',
@@ -86,6 +93,15 @@ const routes: Array<RouteRecordRaw> = [
     name: 'modifyContact',
     component: ModifyContactView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
+  },
+  {
+    path: '/404',
+    name: 'notFound',
+    component: NotFoundView
   }
 ]
 
@@ -94,14 +110,13 @@ const router = createRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {
-//   if (to.meta.requiresAuth && auth.currentUser === null) {
-//     alert('You must be signed in to access this page.')
-
-//     next('/')
-//   } else {
-//     next(to.path)
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && auth.currentUser === null) {
+    alert('You must be signed in to access this page.')
+    next('/')
+  } else {
+    next()
+  }
+})
 
 export default router
