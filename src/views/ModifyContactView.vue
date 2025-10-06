@@ -103,7 +103,7 @@ async function upload () {
 
     contactData.value.contents = contents.value === undefined ? '' : JSON.stringify(contents.value)
 
-    await setDoc(
+    await updateDoc(
       doc(db, 'Contact', 'Introduction'), {
         ...(contactData.value)
       }
