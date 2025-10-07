@@ -110,8 +110,8 @@
       <v-container>
         <v-row>
           <v-col class="footer-text">
-            <p>tsgo@jbnu.ac.kr</p>
-            <p>337, College of Engineering Building 1, Jeonbuk National University, 567, Baekje-daero, Deokjin-gu, Jeonju-si, Jeonbuk State 54896 Republic of Korea</p>
+            <p>{{ footerEmail }}</p>
+            <p>{{ footerAddress }}</p>
             <p>&copy; 2022-2025 Jeonbuk National University Smart Biophotonics Lab. All rights reserved.</p>
             <p>Developed by <span class="github_link" @click="goToGithub">Changjin Ha</span></p>
 
@@ -206,8 +206,9 @@ v-footer {
 import { onMounted, ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { useRouter } from 'vue-router'
-import { auth } from './main'
+import { auth, firestore as db } from './main'
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth'
+import { doc, DocumentSnapshot, getDoc } from 'firebase/firestore'
 
 const theme = useTheme()
 const showMenu = ref(false)
@@ -215,6 +216,9 @@ const showSignIn = ref(false)
 const isSignedIn = ref(false)
 const showProgress = ref(false)
 const router = useRouter()
+
+const footerEmail = ref('')
+const footerAddress = ref('')
 
 const menuItems = ref([
   {
@@ -344,6 +348,18 @@ onMounted(() => {
   } else if (localStorage.getItem('theme') === 'light' && theme.current.value.dark) {
     switchTheme()
   }
+
+  getDoc(doc(db, 'Contact', 'Introduction'))
+    .then((doc: DocumentSnapshot) => {
+      if (doc.exists()) {
+        const data = doc.data()
+        footerEmail.value = data.email
+        footerAddress.value = data.address
+      }
+    })
+    .catch((e: Error) => {
+      console.log(e.message)
+    })
 })
 
 </script>

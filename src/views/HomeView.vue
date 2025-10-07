@@ -125,7 +125,7 @@
           </div>
         </div>
 
-        <v-btn variant="text">
+        <v-btn variant="text" @click="openMap">
           <font-awesome-icon icon="fa-solid fa-location-pin" class="mr-1"/>
         </v-btn>
       </div>
@@ -282,5 +282,10 @@ function call () {
 
 function mailTo () {
   document.location.href = `mailto:${email.value}`
+}
+
+function openMap () {
+  const query = encodeURIComponent(address.value)
+  window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
 }
 </script>
