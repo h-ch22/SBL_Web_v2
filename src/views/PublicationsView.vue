@@ -244,6 +244,9 @@ function uploadPublication () {
           publicationsList.value[index] = { id: selectedId.value, ...newPublicationModel.value }
           filterPublications()
         }
+
+        isEditMode.value = false
+        selectedId.value = ''
         showAddModal.value = false
       })
       .catch((e: Error) => {

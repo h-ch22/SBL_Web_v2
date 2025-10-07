@@ -20,11 +20,6 @@ service firebase.storage {
     	allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
     }
     
-    match /banners/{fileId}{
-    	allow read: if true;
-      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
-    }
-    
     match /contact/{fileId}{
       allow read: if true;
       allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
@@ -42,11 +37,6 @@ service firebase.storage {
     
     match /research/{fileId}{
       allow read: if true;
-      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
-    }
-    
-    match /symbols/{fileId}{
-          allow read: if true;
       allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
     }
   }

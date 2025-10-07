@@ -13,11 +13,6 @@ service cloud.firestore {
       allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
       }
       
-      match /Member/{docId} {
-      allow read: if true;
-      allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
-      }
-      
       match /Coarses/{docId}{
       allow read: if true;
       allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
@@ -35,11 +30,6 @@ service cloud.firestore {
       
       match /Users/{uid}{
       allow read, write, update, create, delete, update: if false;
-      }
-      
-      match /Banners/{docId}{
-      allow read: if true;
-			allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
       }
       
 			match /Gallery/{docId}{
@@ -65,12 +55,6 @@ service cloud.firestore {
       match /Research/{docId}{
       allow read: if true;
       allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
-
-      }
-      
-      match /Symbols/{docId}{
-        allow read: if true;
-      	allow write, update, create, delete, update: if request.auth != null && get(/databases/$(database)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
       }
     }
   }

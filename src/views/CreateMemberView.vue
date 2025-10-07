@@ -7,6 +7,7 @@
             :title="isEditMode ? 'Modify Member' : 'Create New Member'"
             :show-leading-btn="true"
             :leading-icon="'fa-solid fa-chevron-circle-left'"
+            :trailing-icon="isEditMode ? 'fa-solid fa-check' : 'fa-solid fa-plus'"
             :show-progress="showProgress"
             @on-click="upload"
             @on-leading-btn-click="router.back()"

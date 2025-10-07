@@ -7,6 +7,7 @@
         <div>
           <HeaderComponent
             :title="'Lectures'"
+            @on-click="showAddModal = true"
           />
         </div>
 
@@ -99,40 +100,6 @@
                 <font-awesome-icon icon="fa-solid fa-xmark"/>
                 {{ 'No lectures found' }}
               </div>
-
-              <!-- <div
-                v-else
-                v-for="lect in filteredLectures"
-                class="mt-5"
-                :key="lect.id"
-                :style="{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflowY: 'auto',
-                }">
-                  <div class="mb-3" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
-                    <div :style="{ flex: '1 1 0%' }">
-                      <v-chip class="rounded-xl mr-2" color="primary" variant="outlined">{{ lect.graduate === '0' ? 'Undergraduate' : 'Graduate' }}</v-chip>
-                      {{ lect.title }}
-                    </div>
-
-                    <div :style="{ display: 'flex', flexDirection: 'row', flexShrink: 0 }">
-                      <v-btn variant="tonal">
-                        <font-awesome-icon icon="fa-solid fa-link"/>
-                      </v-btn>
-
-                      <div v-if="isSignedIn">
-                        <v-btn variant="tonal" class="ml-2">
-                          <font-awesome-icon icon="fa-solid fa-edit"/>
-                        </v-btn>
-
-                        <v-btn variant="tonal" color="red" class="ml-2">
-                          <font-awesome-icon icon="fa-solid fa-trash"/>
-                        </v-btn>
-                      </div>
-                    </div>
-                  </div>
-              </div> -->
             </div>
         </div>
 
@@ -153,11 +120,24 @@
 
               <div :style="{ display: 'flex', flexDirection: 'row', flexShrink: 0 }">
                 <div v-if="isSignedIn">
-                  <v-btn variant="tonal" class="ml-2">
+                  <v-btn variant="tonal" class="ml-2" @click="
+                    {
+                      isEditMode = true
+                      selectedId = lect.id
+                      newLectureModel = {
+                        title: lect.title,
+                        year: lect.year,
+                        semester: lect.semester,
+                        graduate: lect.graduate
+                      };
+
+                      showAddModal = true
+                    }
+                  ">
                     <font-awesome-icon icon="fa-solid fa-edit"/>
                   </v-btn>
 
-                  <v-btn variant="tonal" color="red" class="ml-2">
+                  <v-btn variant="tonal" color="red" class="ml-2" @click="deleteLecture(lect)">
                     <font-awesome-icon icon="fa-solid fa-trash"/>
                   </v-btn>
                 </div>
@@ -172,6 +152,77 @@
           <font-awesome-icon icon="fa-solid fa-link"/>
         </v-btn>
       </div>
+
+      <v-dialog v-model="showAddModal" max-width="80vw">
+        <v-card class="pa-4">
+            <v-card-title>
+              <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
+                {{ isEditMode ? 'Edit Lecture' : 'Add Lecture' }}
+                <v-spacer/>
+                <v-btn variant="text" @click="showAddModal = false" :disabled="isUploading">
+                  <font-awesome-icon icon="fa-solid fa-xmark"/>
+                </v-btn>
+              </v-row>
+            </v-card-title>
+
+            <v-card-contents>
+              <v-text-field
+                class="mt-4"
+                v-model="newLectureModel.title"
+                label="Title"
+                variant="outlined"
+                color="primary"
+                prepend-icon="mdi-format-title"
+                :style="{ maxWidth: '100vw' }"/>
+
+              <v-text-field
+                class="mt-4"
+                v-model="newLectureModel.year"
+                label="Year"
+                variant="outlined"
+                color="primary"
+                prepend-icon="mdi-calendar"
+                type="number"
+                :style="{ maxWidth: '100vw' }"/>
+
+              <v-select
+                class="mt-4"
+                v-model="newLectureModel.semester"
+                :items="semestersList"
+                label="Semester"
+                variant="outlined"
+                color="primary"
+                prepend-icon="mdi-tree"
+                :style="{ maxWidth: '100vw' }"/>
+
+              <v-checkbox
+                class="mt-4"
+                v-model="newLectureModel.graduate"
+                :true-value="'1'"
+                :false-value="'0'"
+                label="Graduate Course"
+                color="primary"
+                prepend-icon="mdi-school"
+                :style="{ maxWidth: '100vw' }"/>
+            </v-card-contents>
+
+            <v-card-actions>
+              <v-progress-circular
+                v-if="isUploading"
+                indeterminate
+                color="primary"/>
+
+              <v-btn
+                v-else
+                variant="tonal"
+                color="primary"
+                @click="uploadLecture"
+              >
+                <font-awesome-icon icon="fa-solid fa-check"/>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -180,8 +231,8 @@
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import { ref, onMounted, watch } from 'vue'
 import { firestore as db, auth } from '@/main'
-import { collection, getDocs, orderBy, query } from 'firebase/firestore'
-import { Lecture } from '@/types/Lecture'
+import { collection, getDocs, orderBy, query, deleteDoc, doc, updateDoc, addDoc } from 'firebase/firestore'
+import { Lecture, LectureRequest } from '@/types/Lecture'
 import { onAuthStateChanged } from 'firebase/auth'
 
 const lecturesQuery = query(collection(db, 'Coarses'), orderBy('year', 'desc'))
@@ -193,14 +244,102 @@ const selectedYear = ref('')
 
 const semestersList = ref<string[]>(['Spring', 'Summer', 'Fall', 'Winter'])
 const selectedSemester = ref('Spring')
+
 const isLoading = ref(false)
-const searchText = ref('')
+const isUploading = ref(false)
 const isSignedIn = ref(false)
+const isEditMode = ref(false)
+const showAddModal = ref(false)
+
+const searchText = ref('')
+const selectedId = ref('')
+const newLectureModel = ref<LectureRequest>({
+  title: '',
+  year: '',
+  semester: 'Spring',
+  graduate: '0'
+})
 
 function filterLectures () {
   filteredLectures.value = lecturesList.value.filter(lect => {
     return lect.year === selectedYear.value && lect.semester === selectedSemester.value
   })
+}
+
+function uploadLecture () {
+  if (newLectureModel.value.title === '' || newLectureModel.value.year === '' || newLectureModel.value.semester === '') {
+    alert('Please fill in all fields.')
+    return
+  }
+
+  isUploading.value = true
+
+  if (isEditMode.value && selectedId.value !== '') {
+    updateDoc(doc(db, 'Coarses', selectedId.value), {
+      ...newLectureModel.value
+    })
+      .then(() => {
+        alert('Lecture updated successfully.')
+        const index = lecturesList.value.findIndex(p => p.id === selectedId.value)
+        if (index !== -1) {
+          lecturesList.value[index] = { id: selectedId.value, ...newLectureModel.value }
+          filterLectures()
+        }
+
+        isEditMode.value = false
+        selectedId.value = ''
+        showAddModal.value = false
+      })
+      .catch((e: Error) => {
+        console.log(e.message)
+        alert(`An error occurred while updating the lecture: ${e.message}`)
+      })
+      .finally(() => {
+        isUploading.value = false
+      })
+  } else {
+    addDoc(collection(db, 'Coarses'), {
+      ...newLectureModel.value
+    })
+      .then((doc) => {
+        alert('Lecture created successfully.')
+        lecturesList.value.push({
+          id: doc.id,
+          ...newLectureModel.value
+        } as Lecture)
+
+        filterLectures()
+
+        showAddModal.value = false
+      })
+      .catch((e: Error) => {
+        console.log(e.message)
+        alert(`An error occurred while creating the lecture: ${e.message}`)
+      })
+      .finally(() => {
+        isUploading.value = false
+      })
+  }
+}
+
+function deleteLecture (lect: Lecture) {
+  if (confirm(`Are you sure you want to delete ${lect.title} lecture?\nThis action cannot be undone.`)) {
+    isLoading.value = true
+
+    deleteDoc(doc(db, 'Coarses', lect.id))
+      .then(() => {
+        alert('Lecture deleted successfully.')
+        lecturesList.value = lecturesList.value.filter(l => l.id !== lect.id)
+        filterLectures()
+      })
+      .catch((e: Error) => {
+        console.log(e.message)
+        alert(`An error occurred while deleting the lecture: ${e.message}`)
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
+  }
 }
 
 function getLectures () {
@@ -224,6 +363,19 @@ function getLectures () {
 
 watch([selectedSemester, selectedYear], () => {
   filterLectures()
+})
+
+watch(showAddModal, () => {
+  if (!showAddModal.value) {
+    newLectureModel.value = {
+      title: '',
+      year: '',
+      semester: 'Spring',
+      graduate: '0'
+    }
+  }
+
+  isUploading.value = false
 })
 
 watch(searchText, () => {
