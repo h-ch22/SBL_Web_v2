@@ -7,6 +7,7 @@
         <div>
           <HeaderComponent
             :title="'Publications'"
+            @on-click="showAddModal = true"
           />
         </div>
 
@@ -92,11 +93,22 @@
                       </v-btn>
 
                       <div v-if="isSignedIn">
-                        <v-btn variant="tonal" class="ml-2">
+                        <v-btn variant="tonal" class="ml-2" @click="
+                          {
+                            isEditMode = true;
+                            selectedId = pub.id;
+                            newPublicationModel = {
+                              contents: pub.contents,
+                              link: pub.link,
+                              type: pub.type,
+                              year: pub.year
+                            };
+                            showAddModal = true;
+                          }">
                           <font-awesome-icon icon="fa-solid fa-edit"/>
                         </v-btn>
 
-                        <v-btn variant="tonal" color="red" class="ml-2">
+                        <v-btn variant="tonal" color="red" class="ml-2" @click="deletePublication(pub)">
                           <font-awesome-icon icon="fa-solid fa-trash"/>
                         </v-btn>
                       </div>
@@ -104,9 +116,78 @@
                   </div>
               </div>
             </div>
-
         </div>
       </div>
+
+      <v-dialog v-model="showAddModal" max-width="80vw">
+        <v-card class="pa-4">
+            <v-card-title>
+              <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
+                {{ isEditMode ? 'Edit Publication' : 'Add Publication' }}
+                <v-spacer/>
+                <v-btn variant="text" @click="showAddModal = false" :disabled="isUploading">
+                  <font-awesome-icon icon="fa-solid fa-xmark"/>
+                </v-btn>
+              </v-row>
+            </v-card-title>
+
+            <v-card-contents>
+              <v-text-field
+                class="mt-4"
+                v-model="newPublicationModel.contents"
+                label="Contents"
+                variant="outlined"
+                color="primary"
+                prepend-icon="mdi-format-title"
+                :style="{ maxWidth: '100vw' }"/>
+
+              <v-text-field
+                class="mt-4"
+                v-model="newPublicationModel.link"
+                label="Link"
+                variant="outlined"
+                color="primary"
+                prepend-icon="mdi-web"
+                :style="{ maxWidth: '100vw' }"/>
+
+              <v-text-field
+                class="mt-4"
+                v-model="newPublicationModel.year"
+                label="Year"
+                variant="outlined"
+                color="primary"
+                prepend-icon="mdi-calendar"
+                type="number"
+                :style="{ maxWidth: '100vw' }"/>
+
+              <v-select
+                class="mt-4"
+                v-model="newPublicationModel.type"
+                :items="publicationTypes"
+                label="Type"
+                variant="outlined"
+                color="primary"
+                prepend-icon="mdi-tag"
+                :style="{ maxWidth: '100vw' }"/>
+            </v-card-contents>
+
+            <v-card-actions>
+              <v-progress-circular
+                v-if="isUploading"
+                indeterminate
+                color="primary"/>
+
+              <v-btn
+                v-else
+                variant="tonal"
+                color="primary"
+                @click="uploadPublication"
+              >
+                <font-awesome-icon icon="fa-solid fa-check"/>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -115,8 +196,8 @@
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import { ref, onMounted, watch } from 'vue'
 import { firestore as db, auth } from '@/main'
-import { collection, getDocs, orderBy, query } from 'firebase/firestore'
-import { Publication } from '@/types/Publication'
+import { collection, deleteDoc, getDocs, orderBy, query, doc, updateDoc, addDoc } from 'firebase/firestore'
+import { Publication, PublicationRequest } from '@/types/Publication'
 import { onAuthStateChanged } from 'firebase/auth'
 
 const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'))
@@ -127,11 +208,93 @@ const publicationTypes = ref([
 ])
 const selectedType = ref('Intl_Journals')
 const isLoading = ref(true)
+const isUploading = ref(false)
 const isSignedIn = ref(false)
+const isEditMode = ref(false)
+const showAddModal = ref(false)
 const searchText = ref('')
+const selectedId = ref('')
+const newPublicationModel = ref<PublicationRequest>({
+  contents: '',
+  link: '',
+  type: 'Intl_Journals',
+  year: new Date().getFullYear().toString()
+})
 
 function filterPublications () {
   filteredPublications.value = publicationsList.value.filter(pub => pub.type === selectedType.value)
+}
+
+function uploadPublication () {
+  if (newPublicationModel.value.contents === '' || newPublicationModel.value.link === '' || newPublicationModel.value.year === '') {
+    alert('Please fill in all fields.')
+    return
+  }
+
+  isUploading.value = true
+
+  if (isEditMode.value && selectedId.value !== '') {
+    updateDoc(doc(db, 'Publications', selectedId.value), {
+      ...newPublicationModel.value
+    })
+      .then(() => {
+        alert('Publication updated successfully.')
+        const index = publicationsList.value.findIndex(p => p.id === selectedId.value)
+        if (index !== -1) {
+          publicationsList.value[index] = { id: selectedId.value, ...newPublicationModel.value }
+          filterPublications()
+        }
+        showAddModal.value = false
+      })
+      .catch((e: Error) => {
+        console.log(e.message)
+        alert(`An error occurred while updating the publication: ${e.message}`)
+      })
+      .finally(() => {
+        isUploading.value = false
+      })
+  } else {
+    addDoc(collection(db, 'Publications'), {
+      ...newPublicationModel.value
+    })
+      .then((doc) => {
+        alert('Publication created successfully.')
+        publicationsList.value.push({
+          id: doc.id,
+          ...newPublicationModel.value
+        } as Publication)
+        filterPublications()
+
+        showAddModal.value = false
+      })
+      .catch((e: Error) => {
+        console.log(e.message)
+        alert(`An error occurred while creating the publication: ${e.message}`)
+      })
+      .finally(() => {
+        isUploading.value = false
+      })
+  }
+}
+
+function deletePublication (pub: Publication) {
+  if (confirm(`Are you sure you want to delete ${pub.contents} publication?\nThis action cannot be undone.`)) {
+    isLoading.value = true
+
+    deleteDoc(doc(db, 'Publications', pub.id))
+      .then(() => {
+        alert('Publication deleted successfully.')
+        publicationsList.value = publicationsList.value.filter(p => p.id !== pub.id)
+        filterPublications()
+      })
+      .catch((e: Error) => {
+        console.log(e.message)
+        alert(`An error occurred while deleting the publication: ${e.message}`)
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
+  }
 }
 
 onMounted(() => {
@@ -150,6 +313,19 @@ onMounted(() => {
 
 onAuthStateChanged(auth, () => {
   isSignedIn.value = auth.currentUser !== null
+})
+
+watch(showAddModal, () => {
+  if (!showAddModal.value) {
+    newPublicationModel.value = {
+      contents: '',
+      link: '',
+      type: 'Intl_Journals',
+      year: new Date().getFullYear().toString()
+    }
+  }
+
+  isUploading.value = false
 })
 
 watch(selectedType, () => {

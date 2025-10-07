@@ -5,3 +5,10 @@ export type Publication = {
     type: string
     year: string
 }
+
+export type PublicationRequest = {
+    contents: string
+    link: string
+    type: string
+    year: string
+}
