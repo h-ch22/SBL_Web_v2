@@ -9,6 +9,7 @@ import { md3 } from 'vuetify/blueprints'
 export default createVuetify({
   blueprint: md3,
   theme: {
+    defaultTheme: 'system',
     themes: {
       light: {
         colors: {
