@@ -74,6 +74,11 @@
                       class="mt-2"
                       v-model:content="item.contentsDelta"
                       :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+
+                    <v-btn class="mt-2" variant="tonal" :href="item.file">
+                      <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
+                      {{ decodeURIComponent(item.file.split('%2F').pop()?.split('?')[0] ?? 'Download') }}
+                    </v-btn>
                   </v-card-text>
 
                   <v-card-actions>
@@ -86,10 +91,6 @@
                         v-else
                         icon="fa-solid fa-chevron-up"
                       ></font-awesome-icon>
-                    </v-btn>
-
-                    <v-btn variant="text" :href="item.file">
-                      <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
                     </v-btn>
 
                     <v-btn v-if="isSignedIn" @click="router.push({
