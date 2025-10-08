@@ -14,7 +14,7 @@
         webkit-playsinline
         ></video>
 
-      <v-progress-linear v-else indeterminate/>
+      <v-progress-linear v-else indeterminate color="primary" :height="1"/>
 
       <v-btn
         v-if="bannerURL !== ''"
