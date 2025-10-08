@@ -19,6 +19,8 @@
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
             :style="{ maxWidth: '100vw' }"
+            clear-icon="mdi-close"
+            clearable
         ></v-text-field>
 
         <div
@@ -57,7 +59,7 @@
                         @click="selectedYear = year"
                         variant="tonal"
                         class="rounded-pill"
-                        :disabled="searchText !== ''"
+                        :disabled="searchText !== '' || filteredLectures.length === 0"
                         >
                         {{ year }}
                       </v-chip>
@@ -114,6 +116,7 @@
           }">
             <div class="mb-3" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
               <div :style="{ flex: '1 1 0%' }">
+                <v-chip v-if="searchText !== ''" class="rounded-xl mr-2" color="primary" variant="tonal">{{ lect.year }} {{ lect.semester }}</v-chip>
                 <v-chip class="rounded-xl mr-2" color="primary" variant="outlined">{{ lect.graduate === '0' ? 'Undergraduate' : 'Graduate' }}</v-chip>
                 {{ lect.title }}
               </div>
@@ -173,6 +176,8 @@
                 variant="outlined"
                 color="primary"
                 prepend-icon="mdi-format-title"
+                clear-icon="mdi-close"
+                clearable
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-text-field
@@ -243,7 +248,7 @@ const yearsList = ref<string[]>([])
 const selectedYear = ref('')
 
 const semestersList = ref<string[]>(['Spring', 'Summer', 'Fall', 'Winter'])
-const selectedSemester = ref('Spring')
+const selectedSemester = ref(getCurrentSemester())
 
 const isLoading = ref(false)
 const isUploading = ref(false)
@@ -256,14 +261,31 @@ const selectedId = ref('')
 const newLectureModel = ref<LectureRequest>({
   title: '',
   year: new Date().getFullYear().toString(),
-  semester: 'Spring',
+  semester: getCurrentSemester(),
   graduate: '0'
 })
+
+function getCurrentSemester () {
+  const month = new Date().getMonth() + 1
+  if (month >= 3 && month <= 6) {
+    return 'Spring'
+  } else if (month === 7 || month === 8) {
+    return 'Summer'
+  } else if (month >= 9 && month <= 12) {
+    return 'Fall'
+  } else {
+    return 'Winter'
+  }
+}
 
 function filterLectures () {
   filteredLectures.value = lecturesList.value.filter(lect => {
     return lect.year === selectedYear.value && lect.semester === selectedSemester.value
   })
+
+  if (filteredLectures.value.length === 0 && lecturesList.value.length > 0 && lecturesList.value.some(lect => lect.year === selectedYear.value)) {
+    selectedSemester.value = lecturesList.value.find(lect => lect.year === selectedYear.value)?.semester || 'Spring'
+  }
 }
 
 function uploadLecture () {
@@ -369,8 +391,8 @@ watch(showAddModal, () => {
   if (!showAddModal.value) {
     newLectureModel.value = {
       title: '',
-      year: '',
-      semester: 'Spring',
+      year: new Date().getFullYear().toString(),
+      semester: getCurrentSemester(),
       graduate: '0'
     }
   }

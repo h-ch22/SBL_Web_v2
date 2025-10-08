@@ -48,6 +48,8 @@
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
           :style="{ maxWidth: '100vw' }"
+          clear-icon="mdi-close"
+          clearable
         ></v-text-field>
 
         <div
@@ -72,6 +74,10 @@
                         class="text-h4 font-weight-medium mt-2"
                         style="word-break: break-word; white-space: normal;"
                       >
+                        <v-chip v-if="searchText !== ''" class="rounded-xl" color="primary" variant="tonal">
+                          {{ member.cat }}
+                        </v-chip>
+
                         <v-img
                           v-if="member.profile !== '' && member.profile !== undefined && member.profile !== null"
                           :src="member.profile"
@@ -87,9 +93,9 @@
                         />
 
                       <div :style="{ alignContent: 'center' }">
-                        <v-chip variant="outlined" class="rounded-xl" color="primary">
-                          {{ member.degree }}
-                        </v-chip>
+                          <v-chip variant="outlined" class="rounded-xl" color="primary">
+                            {{ member.degree }}
+                          </v-chip>
 
                           {{ member.name }}
                         </div>

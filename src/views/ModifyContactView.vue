@@ -6,7 +6,7 @@
           <HeaderComponent
             :title="'Modify Contact'"
             :trailing-icon="'fa-solid fa-check'"
-            :leading-icon="'fa-solid fa-chevron-circle-left'"
+            :leading-icon="'fa-solid fa-chevron-left'"
             :show-leading-btn="true"
             :show-progress="showProgress"
             @on-click="upload"
@@ -35,6 +35,8 @@
                     v-model="contactData.address"
                     label="Address"
                     prepend-inner-icon="mdi-map-marker"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                 <v-text-field
@@ -43,6 +45,8 @@
                     v-model="contactData.email"
                     label="E-Mail"
                     prepend-inner-icon="mdi-email"
+                    clear-icon="mdi-close"
+                    clearable
                 />
 
                 <v-text-field
@@ -51,6 +55,8 @@
                     v-model="contactData.tel"
                     label="Tel"
                     prepend-inner-icon="mdi-phone"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                   <v-file-input

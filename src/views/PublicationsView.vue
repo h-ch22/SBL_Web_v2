@@ -19,7 +19,41 @@
           variant="outlined"
           color="primary"
           :style="{ maxWidth: '100vw' }"
+          clear-icon="mdi-close"
+          clearable
         ></v-text-field>
+
+        <v-row
+          class="mt-2 mb-2"
+          :style="{
+            display: 'flex',
+            flexDirection: 'row',
+            overflowX: 'auto',
+        }">
+          <div
+            class="ml-2 mt-2"
+            v-for="type in publicationTypes"
+            :key="type">
+            <v-chip
+              v-if="selectedType === type && searchText === ''"
+              prepend-icon="mdi-check"
+              variant="tonal"
+              color="primary"
+              class="rounded-pill">
+              {{ type }}
+            </v-chip>
+
+            <v-chip
+              v-else
+              @click="selectedType = type"
+              variant="tonal"
+              class="rounded-pill"
+              :disabled="searchText !== ''"
+            >
+              {{ type }}
+            </v-chip>
+          </div>
+        </v-row>
 
         <div
           :style="{
@@ -37,38 +71,6 @@
             </div>
 
             <div v-else>
-              <v-row
-                  class="mt-2 mb-2"
-                  :style="{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    overflowX: 'auto',
-                }">
-                  <div
-                    class="ml-2 mt-2"
-                    v-for="type in publicationTypes"
-                    :key="type">
-                    <v-chip
-                      v-if="selectedType === type && searchText === ''"
-                      prepend-icon="mdi-check"
-                      variant="tonal"
-                      color="primary"
-                      class="rounded-pill">
-                      {{ type }}
-                    </v-chip>
-
-                    <v-chip
-                      v-else
-                      @click="selectedType = type"
-                      variant="tonal"
-                      class="rounded-pill"
-                      :disabled="searchText !== ''"
-                    >
-                      {{ type }}
-                    </v-chip>
-                  </div>
-                </v-row>
-
               <div
                 v-for="(pub, index) in filteredPublications"
                 :key="pub.id"
@@ -83,11 +85,15 @@
                 </div>
 
                   <div class="mb-3" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
-                    <div>
+                    <div :style="{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}">
+                      <v-chip v-if="searchText !== ''" class="rounded-xl mb-2" color="primary" variant="outlined">
+                        {{ pub.type }}
+                      </v-chip>
+
                       {{ pub.contents }}
                     </div>
 
-                    <div :style="{ display: 'flex', flexDirection: 'row', flexShrink: 0 }">
+                    <div class="ml-4" :style="{ display: 'flex', flexDirection: 'row', flexShrink: 0 }">
                       <v-btn variant="tonal" :href="pub.link">
                         <font-awesome-icon icon="fa-solid fa-link"/>
                       </v-btn>
@@ -139,6 +145,8 @@
                 variant="outlined"
                 color="primary"
                 prepend-icon="mdi-format-title"
+                clear-icon="mdi-close"
+                clearable
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-text-field
@@ -148,6 +156,8 @@
                 variant="outlined"
                 color="primary"
                 prepend-icon="mdi-web"
+                clear-icon="mdi-close"
+                clearable
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-text-field
@@ -158,6 +168,8 @@
                 color="primary"
                 prepend-icon="mdi-calendar"
                 type="number"
+                clear-icon="mdi-close"
+                clearable
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-select
@@ -204,7 +216,7 @@ const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 
 const publicationsList = ref<Publication[]>([])
 const filteredPublications = ref<Publication[]>([])
 const publicationTypes = ref([
-  'Intl_Journals', 'Intl_Conferences', 'Domestic_Journals', 'Domestic_Conferences'
+  'Intl_Journals', 'Intl_Conferences', 'Domestic_Journals', 'Domestic_Conferences', 'Patent', 'Book'
 ])
 const selectedType = ref('Intl_Journals')
 const isLoading = ref(true)

@@ -6,7 +6,7 @@
           <HeaderComponent
             :title="isEditMode ? 'Modify Member' : 'Create New Member'"
             :show-leading-btn="true"
-            :leading-icon="'fa-solid fa-chevron-circle-left'"
+            :leading-icon="'fa-solid fa-chevron-left'"
             :trailing-icon="isEditMode ? 'fa-solid fa-check' : 'fa-solid fa-plus'"
             :show-progress="showProgress"
             @on-click="upload"
@@ -48,6 +48,8 @@
                     v-model="memberData.name"
                     label="Name"
                     prepend-inner-icon="mdi-account"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                   <v-text-field
@@ -56,6 +58,8 @@
                     v-model="memberData.dept"
                     label="Department"
                     prepend-inner-icon="mdi-office-building"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                   <v-select
@@ -97,6 +101,8 @@
                     type="email"
                     color="primary"
                     prepend-inner-icon="mdi-email"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                   <v-text-field
@@ -106,6 +112,8 @@
                     type="phone"
                     color="primary"
                     prepend-inner-icon="mdi-phone"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                   <v-text-field
@@ -115,6 +123,8 @@
                     type="url"
                     color="primary"
                     prepend-inner-icon="mdi-web"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                   <v-text-field
@@ -123,6 +133,8 @@
                     label="Interests"
                     color="primary"
                     prepend-inner-icon="mdi-star"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                   <v-file-input

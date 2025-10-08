@@ -83,19 +83,19 @@
                 </v-card-title>
 
                 <v-card-subtitle>
-                  <font-awesome-icon icon="fa-solid fa-building" class="mr-1"/>
-                  {{ project.agency }}
+                    <font-awesome-icon icon="fa-solid fa-calendar" class="mr-1"/>
+                    {{ project.beginDate }} - {{ project.endDate }}
                 </v-card-subtitle>
 
                 <v-card-text class="px-7">
                   <v-row :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center' }">
-                    <font-awesome-icon icon="fa-solid fa-calendar" class="mr-1"/>
-                    {{ project.beginDate }} - {{ project.endDate }}
+                    <font-awesome-icon icon="fa-solid fa-building" class="mr-1"/>
+                    {{ project.agency }}
                   </v-row>
 
                   <v-row :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center' }">
                     <font-awesome-icon icon="fa-solid fa-money-bill" class="mr-1"/>
-                    {{ project.budget }} {{ project.budgetUnit }}
+                    {{ project.budget.includes(',') ? project.budget : project.budget.replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} {{ project.budgetUnit }}
                   </v-row>
                 </v-card-text>
 
@@ -163,6 +163,8 @@
                 variant="outlined"
                 color="primary"
                 prepend-icon="mdi-format-title"
+                clear-icon="mdi-close"
+                clearable
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-text-field
@@ -172,6 +174,8 @@
                 variant="outlined"
                 color="primary"
                 prepend-icon="mdi-office-building"
+                clear-icon="mdi-close"
+                clearable
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-row class="mt-4" :style="{ maxWidth: '100vw', justifyContent: 'center' }">
@@ -182,6 +186,8 @@
                   color="primary"
                   type="number"
                   prepend-icon="mdi-cash-multiple"
+                  clear-icon="mdi-close"
+                  clearable
                   :style="{ maxWidth: '65vw' }"/>
 
                 <v-text-field
@@ -191,6 +197,8 @@
                   variant="outlined"
                   color="primary"
                   prepend-icon="mdi-currency-usd"
+                  clear-icon="mdi-close"
+                  clearable
                   :style="{ maxWidth: '25vw' }"/>
               </v-row>
 
@@ -553,6 +561,21 @@ watch(selectedOption, () => {
     getProjects()
   } else {
     getResearch()
+  }
+})
+
+watch(showAddModal, (newVal) => {
+  if (!newVal) {
+    isEditMode.value = false
+    selectedId.value = ''
+    newProjectModel.value = {
+      agency: '',
+      beginDate: `${new Date().getFullYear()}.${String(new Date().getMonth() + 1).padStart(2, '0')}.${String(new Date().getDate()).padStart(2, '0')}`,
+      budget: '',
+      budgetUnit: 'KRW',
+      contents: '',
+      endDate: `${new Date().getFullYear()}.${String(new Date().getMonth() + 1).padStart(2, '0')}.${String(new Date().getDate()).padStart(2, '0')}`
+    }
   }
 })
 

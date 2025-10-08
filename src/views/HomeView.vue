@@ -209,7 +209,6 @@ const theme = useTheme()
 
 const isPlaying = ref(true)
 
-let videoElement: HTMLVideoElement | null = null
 const newsQuery = query(collection(db, 'News'), orderBy('date', 'desc'), limit(5))
 const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'), limit(5))
 const contactRef = doc(db, 'Contact', 'Introduction')
@@ -229,11 +228,6 @@ onMounted(() => {
     .catch((e: Error) => {
       console.log(e.message)
     })
-  videoElement = document.getElementById('banner-video') as HTMLVideoElement
-  if (videoElement) {
-    videoElement.addEventListener('play', () => { isPlaying.value = true })
-    videoElement.addEventListener('pause', () => { isPlaying.value = false })
-  }
 
   getDocs(newsQuery)
     .then((docs) => {
@@ -282,12 +276,21 @@ onMounted(() => {
 })
 
 function togglePlayPause () {
+  const videoElement = document.getElementById('banner-video') as HTMLVideoElement
+  if (videoElement) {
+    videoElement.addEventListener('play', () => { isPlaying.value = true })
+    videoElement.addEventListener('pause', () => { isPlaying.value = false })
+  }
+
   if (!videoElement) return
   if (videoElement.paused) {
     videoElement.play()
   } else {
     videoElement.pause()
   }
+
+  videoElement.removeEventListener('play', () => { isPlaying.value = true })
+  videoElement.removeEventListener('pause', () => { isPlaying.value = false })
 }
 
 function call () {

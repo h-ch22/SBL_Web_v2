@@ -20,6 +20,8 @@
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         :style="{ maxWidth: '100vw' }"
+        clear-icon="mdi-close"
+        clearable
       ></v-text-field>
 
       <div

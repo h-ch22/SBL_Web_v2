@@ -5,7 +5,7 @@
         <div>
           <HeaderComponent
             :title="isEditMode ? 'Modify Post' : 'Create New Post'"
-            :leading-icon="'fa-solid fa-chevron-circle-left'"
+            :leading-icon="'fa-solid fa-chevron-left'"
             :show-leading-btn="true"
             :trailing-icon="'fa-solid fa-check'"
             :show-progress="showProgress"
@@ -33,6 +33,8 @@
                     v-model="postData.title"
                     label="Title"
                     prepend-inner-icon="mdi-format-title"
+                    clear-icon="mdi-close"
+                    clearable
                   />
 
                   <v-select

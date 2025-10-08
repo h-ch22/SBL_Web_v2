@@ -19,6 +19,8 @@
         variant="outlined"
         color="primary"
         :style="{ maxWidth: '100vw' }"
+        clear-icon="mdi-close"
+        clearable
       ></v-text-field>
 
       <div
@@ -43,7 +45,7 @@
           </div>
 
           <div
-              v-else-if="!isLoading && itemsList.length === 0"
+              v-else-if="!isLoading && filteredList.length === 0"
               class="mt-5"
               :style="{
                   display: 'flex',

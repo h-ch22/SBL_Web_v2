@@ -82,6 +82,8 @@
             prepend-icon="mdi-email"
             color="primary"
             :style="{ width: detectMobile() ? '70vw' : '22vw' }"
+            clearable
+            clear-icon="mdi-close"
           ></v-text-field>
 
           <v-text-field
@@ -92,6 +94,8 @@
             prepend-icon="mdi-key"
             color="primary"
             :style="{ width: detectMobile() ? '70vw' : '22vw' }"
+            clearable
+            clear-icon="mdi-close"
           ></v-text-field>
 
           <v-btn v-if="!showProgress" variant="tonal" @click="signIn">Sign In</v-btn>
