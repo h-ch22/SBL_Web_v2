@@ -2,8 +2,9 @@
   <div>
     <div id="banner-section">
       <video
+        v-if="bannerURL !== ''"
         id="banner-video"
-        :src="require('@/assets/Intro_Banner.mp4')"
+        :src="bannerURL"
         autoplay
         loop
         muted
@@ -13,7 +14,10 @@
         webkit-playsinline
         ></video>
 
+      <v-progress-linear v-else indeterminate/>
+
       <v-btn
+        v-if="bannerURL !== ''"
         id="play-pause-button"
         @click="togglePlayPause"
         variant="text"
@@ -140,12 +144,12 @@
 </template>
 
 <style>
-video::-webkit-media-controls {
+#banner-video::-webkit-media-controls {
   display: none !important;
   opacity: 0;
 }
 
-video::-webkit-media-controls-start-playback-button {
+#banner-video::-webkit-media-controls-start-playback-button {
   display: none !important;
 }
 
@@ -155,11 +159,12 @@ video::-webkit-media-controls-start-playback-button {
   max-height: 100vh;
 }
 
-#banner-section video {
+#banner-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   filter: brightness(0.9);
+  pointer-events: none;
 }
 
 #play-pause-button {
@@ -167,7 +172,7 @@ video::-webkit-media-controls-start-playback-button {
   height: 30px;
   position: absolute;
   left: 50%;
-  top: 75vh;
+  top: 85vh;
   transform: translateX(-50%);
   border-radius: 50%;
   display: flex;
@@ -193,9 +198,10 @@ video::-webkit-media-controls-start-playback-button {
 
 <script setup lang="ts">
 import { collection, doc, DocumentSnapshot, getDocs, getDoc, limit, orderBy, query } from 'firebase/firestore'
+import { ref as storageRef, getDownloadURL } from 'firebase/storage'
 import { ref, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
-import { firestore as db } from '@/main'
+import { firestore as db, storage } from '@/main'
 import { News } from '@/types/News'
 import { Publication } from '@/types/Publication'
 import router from '@/router'
@@ -213,8 +219,16 @@ const publicationList = ref<Publication[]>([])
 const phone = ref('')
 const email = ref('')
 const address = ref('')
+const bannerURL = ref('')
 
 onMounted(() => {
+  getDownloadURL(storageRef(storage, 'banner/intro_banner.mp4'))
+    .then((url) => {
+      bannerURL.value = url
+    })
+    .catch((e: Error) => {
+      console.log(e.message)
+    })
   videoElement = document.getElementById('banner-video') as HTMLVideoElement
   if (videoElement) {
     videoElement.addEventListener('play', () => { isPlaying.value = true })

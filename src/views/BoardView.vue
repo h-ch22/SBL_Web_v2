@@ -63,6 +63,7 @@
                   <v-card class="rounded-xl" variant="outlined">
                     <v-card-title
                       class="text-h4 font-weight-medium mt-2"
+                      style="word-break: break-word; white-space: normal;"
                     >
                       <v-img
                         v-if="item.image !== '' && item.image !== undefined && item.image !== null"
@@ -70,7 +71,7 @@
                         height="40vh"
                       />
 
-                    <div :style="{ alignContent: 'center', width: '40vw', maxWidth: '100vw' }" class="text-h5 mt-2">
+                    <div :style="{ alignContent: 'center' }" class="text-h5 mt-2">
                         {{ item.title }}
                       </div>
                     </v-card-title>

@@ -155,7 +155,7 @@
 
       <v-dialog v-model="showAddModal" max-width="80vw">
         <v-card class="pa-4">
-            <v-card-title>
+            <v-card-title style="word-break: break-word; white-space: normal;">
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
                 {{ isEditMode ? 'Edit Lecture' : 'Add Lecture' }}
                 <v-spacer/>
@@ -255,7 +255,7 @@ const searchText = ref('')
 const selectedId = ref('')
 const newLectureModel = ref<LectureRequest>({
   title: '',
-  year: '',
+  year: new Date().getFullYear().toString(),
   semester: 'Spring',
   graduate: '0'
 })

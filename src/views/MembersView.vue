@@ -70,6 +70,7 @@
                     <v-card class="rounded-xl" variant="outlined">
                       <v-card-title
                         class="text-h4 font-weight-medium mt-2"
+                        style="word-break: break-word; white-space: normal;"
                       >
                         <v-img
                           v-if="member.profile !== '' && member.profile !== undefined && member.profile !== null"

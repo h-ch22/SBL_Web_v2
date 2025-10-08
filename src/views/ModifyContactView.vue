@@ -61,7 +61,7 @@
                     variant="solo-filled"
                   ></v-file-input>
 
-                  <QuillEditor placeholder="Contents" v-model:content="contents" theme="snow" toolbar="full"/>
+                  <QuillEditor placeholder="Contents" v-model:content="contents" theme="snow" toolbar="full" :modules="modules"/>
               </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -73,6 +73,7 @@
 
 <script lang="ts" setup>
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import ImageUploader from 'quill-image-uploader'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import { firestore as db, storage } from '@/main'
 import { onMounted, ref } from 'vue'
@@ -94,6 +95,38 @@ const contactData = ref<ContactUpdateRequest>({
   latLng: '',
   tel: ''
 })
+
+const modules = {
+  name: 'Imageuploader',
+  module: ImageUploader,
+  options: {
+    upload: (file: File) => {
+      showProgress.value = true
+
+      return new Promise((resolve, reject) => {
+        uploadBytes(storageRef(storage, `contact/${file.name}`), file)
+          .then((snapshot) => {
+            getDownloadURL(snapshot.ref)
+              .then((url) => {
+                resolve(url)
+              })
+              .catch((e: Error) => {
+                console.log(e.message)
+                reject(e)
+              })
+              .finally(() => {
+                showProgress.value = false
+              })
+          })
+          .catch((e: Error) => {
+            showProgress.value = false
+            console.log(e.message)
+            reject(e)
+          })
+      })
+    }
+  }
+}
 
 async function upload () {
   if (contactData.value.address === '' || contents.value === undefined || contactData.value.email === '' || contactData.value.tel === '') {

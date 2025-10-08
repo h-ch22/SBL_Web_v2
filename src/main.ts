@@ -52,7 +52,10 @@ import {
   faArrowLeft,
   faHome,
   faChevronLeft,
-  faChevronCircleLeft
+  faChevronCircleLeft,
+  faCalendar,
+  faBuilding,
+  faMoneyBill
 } from '@fortawesome/free-solid-svg-icons'
 import { faLine } from '@fortawesome/free-brands-svg-icons'
 
@@ -108,7 +111,10 @@ library.add(
   faClipboardCheck,
   faWarning,
   faArrowLeft,
-  faHome
+  faHome,
+  faCalendar,
+  faBuilding,
+  faMoneyBill
 )
 
 loadFonts()

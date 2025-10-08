@@ -54,6 +54,7 @@
                 <v-card class="rounded-xl" variant="outlined">
                   <v-card-title
                     class="text-h4 font-weight-medium mt-2"
+                    style="word-break: break-word; white-space: normal;"
                   >
                   <div :style="{ alignContent: 'center', width: '40vw', maxWidth: '100vw' }" class="text-h5 mt-2">
                       {{ item.title }}

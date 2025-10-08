@@ -5,6 +5,10 @@ rules_version = '2';
 //    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+    match /banner/{fileId} {
+      allow read: if true;
+      allow write, update, create, delete: if false;
+    }
 		match /news/img/{fileId}{
     	allow read: if true;
     	allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;

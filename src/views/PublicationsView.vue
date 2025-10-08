@@ -121,7 +121,7 @@
 
       <v-dialog v-model="showAddModal" max-width="80vw">
         <v-card class="pa-4">
-            <v-card-title>
+            <v-card-title style="word-break: break-word; white-space: normal;">
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
                 {{ isEditMode ? 'Edit Publication' : 'Add Publication' }}
                 <v-spacer/>

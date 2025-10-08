@@ -5,7 +5,7 @@
           <v-img
             class="home-btn"
             @click="router.push({ name: 'home' })"
-            :src="require(`@/assets/SBL_Traditional_Symbol_Horizontal_English_${theme.current.value.dark ? 'White' : 'Black'}.svg`)"
+            :src="require(`@/assets/SBL_Traditional_Symbol_Horizontal_English_${(theme.current.value.dark) ? 'White' : 'Black'}.svg`)"
             contain
             width="300"
             min-width="150">
