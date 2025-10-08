@@ -221,7 +221,7 @@
 
           <div class="mt-2" v-if="selectedMember.degree !== undefined">
             <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
-            {{ selectedMember.degree }}
+            {{ selectedMember.dept }}
           </div>
 
           <div class="mt-2" v-if="selectedMember.interests !== '' && selectedMember.interests !== undefined">
