@@ -96,6 +96,13 @@
                       ></font-awesome-icon>
                     </v-btn>
 
+                    <v-btn variant="text" @click="{
+                      selectedItem = item;
+                      showWindow = true;
+                    }">
+                      <font-awesome-icon icon="fa-solid fa-window-maximize"></font-awesome-icon>
+                    </v-btn>
+
                     <v-btn v-if="isSignedIn" @click="router.push({
                         name: 'modifyPost',
                         state: {
@@ -121,6 +128,63 @@
         </v-row>
       </div>
       </div>
+
+      <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow" max-width="800px">
+        <v-card class="pa-5">
+          <v-card-title style="word-break: break-word; white-space: pre-wrap;">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+              <div style="max-width: 70%; word-break: break-word; white-space: pre-wrap;">
+                {{ selectedItem.title }}
+              </div>
+              <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="text" @click="selectedItem = null; showWindow = false;">
+                <font-awesome-icon icon="fa-solid fa-xmark"/>
+              </v-btn>
+            </div>
+          </v-card-title>
+
+          <v-card-subtitle>
+            {{ selectedItem.date }}
+          </v-card-subtitle>
+
+          <v-card-text>
+            <QuillEditor
+              class="mt-2"
+              v-model:content="selectedItem.contentsDelta"
+              :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn class="mt-2" variant="tonal" :href="selectedItem.file">
+              <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
+              {{ decodeURIComponent(selectedItem.file.split('%2F').pop()?.split('?')[0] ?? 'Download') }}
+            </v-btn>
+
+            <v-spacer></v-spacer>
+
+            <v-btn v-if="isSignedIn" @click="{
+              showWindow = false;
+              router.push({
+                name: 'modifyPost',
+                state: {
+                  post: {
+                    id: selectedItem.id,
+                    contents: selectedItem.contents,
+                    title: selectedItem.title,
+                    date: selectedItem.date,
+                    category: 'Downloads'
+                  }
+                }
+              });
+            }">
+              <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
+            </v-btn>
+
+            <v-btn v-if="isSignedIn" color="red" @click="deleteItem(selectedItem)">
+              <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -142,6 +206,8 @@ const searchText = ref('')
 const downloadsList = ref<Download[]>([])
 const filteredList = ref<Download[]>([])
 const isSignedIn = ref(false)
+const selectedItem = ref<Download | null>(null)
+const showWindow = ref(false)
 
 function isExpandedAll () {
   return filteredList.value.every(item => item.showContents)
@@ -156,7 +222,9 @@ function expandAll () {
 
 function deleteItem (item: Download) {
   if (confirm(`Are you sure you want to delete post ${item.title}?\nThis action cannot be undone.`)) {
+    showWindow.value = false
     isLoading.value = true
+
     deleteDoc(doc(db, 'Downloads', item.id as string))
       .then(() => {
         if (item.file !== '' && item.file !== undefined && item.file !== null) {
@@ -216,4 +284,9 @@ watch(searchText, () => {
   }
 })
 
+watch(showWindow, () => {
+  if (!showWindow.value) {
+    selectedItem.value = null
+  }
+})
 </script>

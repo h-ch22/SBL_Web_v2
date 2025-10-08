@@ -43,7 +43,7 @@ import {
   faChevronDown,
   faChevronUp,
   faLocationPin,
-  faExpand,
+  faArrowUpRightFromSquare,
   faCheck,
   faList,
   faClipboard,
@@ -55,7 +55,8 @@ import {
   faChevronCircleLeft,
   faCalendar,
   faBuilding,
-  faMoneyBill
+  faMoneyBill,
+  faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons'
 import { faLine } from '@fortawesome/free-brands-svg-icons'
 
@@ -103,7 +104,6 @@ library.add(
   faChevronLeft,
   faChevronCircleLeft,
   faLocationPin,
-  faExpand,
   faCheck,
   faLine,
   faList,
@@ -114,7 +114,9 @@ library.add(
   faHome,
   faCalendar,
   faBuilding,
-  faMoneyBill
+  faMoneyBill,
+  faArrowUpRightFromSquare,
+  faWindowMaximize
 )
 
 loadFonts()

@@ -107,8 +107,15 @@
                         ></font-awesome-icon>
                       </v-btn>
 
+                      <v-btn variant="text" @click="{
+                        selectedItem = item;
+                        showWindow = true;
+                      }">
+                        <font-awesome-icon icon="fa-solid fa-window-maximize"></font-awesome-icon>
+                      </v-btn>
+
                       <v-btn variant="text" :href="item.image">
-                        <font-awesome-icon icon="fa-solid fa-expand"></font-awesome-icon>
+                        <font-awesome-icon icon="fa-solid fa-arrow-up-right-from-square"></font-awesome-icon>
                       </v-btn>
 
                       <v-btn v-if="isSignedIn" @click="router.push({
@@ -136,6 +143,65 @@
           </v-row>
       </div>
     </div>
+
+    <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow" max-width="800px">
+      <v-card class="pa-5">
+        <v-card-title style="word-break: break-word; white-space: pre-wrap;">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div style="max-width: 70%; word-break: break-word; white-space: pre-wrap;">
+              {{ selectedItem.title }}
+            </div>
+            <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="text" @click="selectedItem = null; showWindow = false;">
+              <font-awesome-icon icon="fa-solid fa-xmark"/>
+            </v-btn>
+          </div>
+        </v-card-title>
+
+        <v-card-subtitle>
+          {{ selectedItem.date }}
+        </v-card-subtitle>
+
+        <v-card-text>
+          <div v-if="selectedItem.image !== '' && selectedItem.image !== undefined && selectedItem.image !== null">
+            <v-img
+              :src="selectedItem.image"
+              height="40vh"
+            />
+          </div>
+
+          <QuillEditor
+            class="mt-2"
+            v-model:content="selectedItem.contentsDelta"
+            :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn v-if="isSignedIn" @click="{
+            showWindow = false;
+            router.push({
+              name: 'modifyPost',
+              state: {
+                post: {
+                  id: selectedItem.id,
+                  contents: selectedItem.contents,
+                  title: selectedItem.title,
+                  date: selectedItem.date,
+                  category: getRouteName()
+                }
+              }
+            });
+          }">
+            <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
+          </v-btn>
+
+          <v-btn v-if="isSignedIn" color="red" @click="deleteItem(selectedItem)">
+            <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </div>
 </template>
@@ -158,6 +224,8 @@ const filteredList = ref<CommonBoardItem[]>([])
 const isLoading = ref(true)
 const searchText = ref('')
 const isSignedIn = ref(false)
+const selectedItem = ref<CommonBoardItem | null>(null)
+const showWindow = ref(false)
 let itemsQuery: Query | undefined
 
 function isExpandedAll () {
@@ -229,6 +297,7 @@ function getItems () {
 
 function deleteItem (item: CommonBoardItem) {
   if (confirm(`Are you sure you want to delete post ${item.title}?\nThis action cannot be undone.`)) {
+    showWindow.value = false
     isLoading.value = true
     deleteDoc(doc(db, getRouteName(), item.id as string))
       .then(() => {
@@ -240,11 +309,13 @@ function deleteItem (item: CommonBoardItem) {
             .finally(() => {
               alert('Post deleted successfully.')
               itemsList.value = itemsList.value.filter(i => i.id !== item.id)
+              filteredList.value = filteredList.value.filter(i => i.id !== item.id)
               isLoading.value = false
             })
         } else {
           alert('Post deleted successfully.')
           itemsList.value = itemsList.value.filter(i => i.id !== item.id)
+          filteredList.value = filteredList.value.filter(i => i.id !== item.id)
           isLoading.value = false
         }
       })
@@ -272,6 +343,12 @@ watch(searchText, () => {
     filteredList.value = itemsList.value
   } else {
     filteredList.value = itemsList.value.filter(item => item.title.toLowerCase().includes(searchText.value.toLowerCase()) || (item.contents !== undefined && item.contents.toLowerCase().includes(searchText.value.toLowerCase())))
+  }
+})
+
+watch(showWindow, () => {
+  if (!showWindow.value) {
+    selectedItem.value = null
   }
 })
 </script>

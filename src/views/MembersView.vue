@@ -70,6 +70,7 @@
               <font-awesome-icon icon="fa-solid fa-xmark"/>
               {{ 'No members found' }}
             </div>
+
             <v-row v-else>
               <v-col class="mt-5" v-for="member in filteredMembers" :key="member.id">
                   <div>
@@ -138,6 +139,14 @@
                           <font-awesome-icon v-if="member.showCareer" icon="fa-solid fa-chevron-up"/>
                           <font-awesome-icon v-else icon="fa-solid fa-chevron-down"/>
                         </v-btn>
+
+                      <v-btn variant="text" @click="{
+                        selectedMember = member;
+                        showWindow = true;
+                      }">
+                        <font-awesome-icon icon="fa-solid fa-window-maximize"></font-awesome-icon>
+                      </v-btn>
+
                         <v-btn v-if="member.website !== ''" :color="theme.current.value.colors['on-background']" :href="member.website">
                           <font-awesome-icon icon="fa-solid fa-link"></font-awesome-icon>
                         </v-btn>
@@ -173,6 +182,92 @@
             </v-row>
         </div>
       </div>
+
+    <v-dialog v-if="showWindow && selectedMember !== null" v-model="showWindow" max-width="800px">
+      <v-card class="pa-5">
+        <v-card-title style="word-break: break-word; white-space: pre-wrap;">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div style="max-width: 70%; word-break: break-word; white-space: pre-wrap;">
+              <v-chip variant="outlined" class="rounded-xl mr-2" color="primary">
+                {{ selectedMember.cat }}
+              </v-chip>
+
+              {{ selectedMember.name}}
+            </div>
+
+            <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="text" @click="selectedMember = null; showWindow = false;">
+              <font-awesome-icon icon="fa-solid fa-xmark"/>
+            </v-btn>
+          </div>
+        </v-card-title>
+
+        <v-card-text>
+          <div v-if="selectedMember.profile !== '' && selectedMember.profile !== undefined && selectedMember.profile !== null">
+            <v-img
+              :src="selectedMember.profile"
+              height="40vh"
+            />
+          </div>
+
+          <div class="mt-2" v-if="selectedMember.email !== ''">
+            <font-awesome-icon icon="fa-solid fa-envelope"/>
+            {{ selectedMember.email }}
+          </div>
+
+          <div class="mt-2" v-if="selectedMember.tel !== ''">
+            <font-awesome-icon icon="fa-solid fa-phone"/>
+            {{ selectedMember.tel }}
+          </div>
+
+          <div class="mt-2" v-if="selectedMember.degree !== undefined">
+            <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
+            {{ selectedMember.degree }}
+          </div>
+
+          <div class="mt-2" v-if="selectedMember.interests !== '' && selectedMember.interests !== undefined">
+            <font-awesome-icon icon="fa-solid fa-star"/>
+            {{ selectedMember.interests }}
+          </div>
+
+          <QuillEditor
+            class="mt-2"
+            v-model:content="selectedMember.careerDelta"
+            :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn v-if="isSignedIn" @click="{
+            showWindow = false;
+            router.push({
+                name: 'modifyMember',
+                state: {
+                  member: {
+                    id: selectedMember.id,
+                    email: selectedMember.email ?? '',
+                    tel: selectedMember.tel ?? '',
+                    website: selectedMember.website ?? '',
+                    career: selectedMember.career ?? '',
+                    careerDelta: JSON.stringify(selectedMember.careerDelta ?? ''),
+                    cat: selectedMember.cat ?? '',
+                    degree: selectedMember.degree ?? '',
+                    dept: selectedMember.dept ?? '',
+                    name: selectedMember.name ?? '',
+                    interests: selectedMember.interests ?? ''
+                  }
+                }
+              });
+          }">
+            <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
+          </v-btn>
+
+          <v-btn v-if="isSignedIn" color="red" @click="deleteMember(selectedMember)">
+            <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     </v-container>
   </div>
 </template>
@@ -204,6 +299,8 @@ const theme = useTheme()
 const router = useRouter()
 const searchText = ref('')
 const alwaysExpandAll = ref(false)
+const selectedMember = ref<Member | null>(null)
+const showWindow = ref(false)
 
 function isExpandedAll () {
   return filteredMembers.value.every(member => member.showCareer)
@@ -229,6 +326,7 @@ function filterMembers () {
 
 function deleteMember (member: Member) {
   if (confirm(`Are you sure you want to delete member ${member.name}?\nThis action cannot be undone.`)) {
+    showWindow.value = false
     isLoading.value = true
     deleteDoc(doc(db, 'Members', member.id as string))
       .then(() => {
@@ -290,6 +388,12 @@ watch(searchText, () => {
     filterMembers()
   } else {
     filteredMembers.value = members.value.filter(member => member.name.toLowerCase().includes(searchText.value.toLowerCase()) || (member.dept !== undefined && member.dept.toLowerCase().includes(searchText.value.toLowerCase())) || (member.degree !== undefined && member.degree.toLowerCase().includes(searchText.value.toLowerCase())) || (member.interests !== undefined && member.interests.toLowerCase().includes(searchText.value.toLowerCase())) || (member.email !== undefined && member.email.toLowerCase().includes(searchText.value.toLowerCase())) || (member.tel !== undefined && member.tel.toLowerCase().includes(searchText.value.toLowerCase())))
+  }
+})
+
+watch(showWindow, () => {
+  if (!showWindow.value) {
+    selectedMember.value = null
   }
 })
 </script>
