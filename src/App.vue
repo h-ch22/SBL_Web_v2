@@ -1,6 +1,6 @@
 <template>
   <v-app>
-      <v-app-bar app color="transparent" style="backdrop-filter: blur(2px)">
+      <v-app-bar app color="transparent" :style="{ backdropFilter: router.currentRoute.value.path === '/' ? 'blur(0px)' : 'blur(2px)'}">
         <v-toolbar-title>
           <v-img
             class="home-btn"
