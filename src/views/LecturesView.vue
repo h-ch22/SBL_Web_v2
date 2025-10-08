@@ -314,10 +314,12 @@ function uploadLecture () {
           filterLectures()
         }
 
+        filterYears()
+        selectedYear.value = newLectureModel.value.year
+        selectedSemester.value = newLectureModel.value.semester
         isEditMode.value = false
         selectedId.value = ''
         showAddModal.value = false
-        filterYears()
       })
       .catch((e: Error) => {
         console.log(e.message)
@@ -339,6 +341,8 @@ function uploadLecture () {
 
         filterLectures()
         filterYears()
+        selectedYear.value = newLectureModel.value.year
+        selectedSemester.value = newLectureModel.value.semester
         showAddModal.value = false
       })
       .catch((e: Error) => {
