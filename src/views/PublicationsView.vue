@@ -21,6 +21,7 @@
           :style="{ maxWidth: '100vw' }"
           clear-icon="mdi-close"
           clearable
+          @click:clear="searchText = ''"
         ></v-text-field>
 
         <v-row
@@ -147,6 +148,7 @@
                 prepend-icon="mdi-format-title"
                 clear-icon="mdi-close"
                 clearable
+                @click:clear="newPublicationModel.contents = ''"
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-text-field
@@ -158,6 +160,7 @@
                 prepend-icon="mdi-web"
                 clear-icon="mdi-close"
                 clearable
+                @click:clear="newPublicationModel.link = ''"
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-text-field
@@ -170,6 +173,7 @@
                 type="number"
                 clear-icon="mdi-close"
                 clearable
+                @click:clear="newPublicationModel.year = ''"
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-select

@@ -22,6 +22,7 @@
         :style="{ maxWidth: '100vw' }"
         clear-icon="mdi-close"
         clearable
+        @click:clear="searchText = ''"
       ></v-text-field>
 
       <div

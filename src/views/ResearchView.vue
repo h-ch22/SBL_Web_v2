@@ -165,6 +165,7 @@
                 prepend-icon="mdi-format-title"
                 clear-icon="mdi-close"
                 clearable
+                @click:clear="newProjectModel.contents = ''"
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-text-field
@@ -176,6 +177,7 @@
                 prepend-icon="mdi-office-building"
                 clear-icon="mdi-close"
                 clearable
+                @click:clear="newProjectModel.agency = ''"
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-row class="mt-4" :style="{ maxWidth: '100vw', justifyContent: 'center' }">
@@ -188,6 +190,7 @@
                   prepend-icon="mdi-cash-multiple"
                   clear-icon="mdi-close"
                   clearable
+                  @click:clear="newProjectModel.budget = ''"
                   :style="{ maxWidth: '65vw' }"/>
 
                 <v-text-field
@@ -199,6 +202,7 @@
                   prepend-icon="mdi-currency-usd"
                   clear-icon="mdi-close"
                   clearable
+                  @click:clear="newProjectModel.budgetUnit = ''"
                   :style="{ maxWidth: '25vw' }"/>
               </v-row>
 

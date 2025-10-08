@@ -35,6 +35,7 @@
                     prepend-inner-icon="mdi-format-title"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="postData.title = ''"
                   />
 
                   <v-select

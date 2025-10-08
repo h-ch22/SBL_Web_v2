@@ -37,6 +37,7 @@
                     prepend-inner-icon="mdi-map-marker"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="contactData.address = ''"
                   />
 
                 <v-text-field
@@ -47,6 +48,7 @@
                     prepend-inner-icon="mdi-email"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="contactData.email = ''"
                 />
 
                 <v-text-field
@@ -57,6 +59,7 @@
                     prepend-inner-icon="mdi-phone"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="contactData.tel = ''"
                   />
 
                   <v-file-input

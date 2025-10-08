@@ -21,6 +21,7 @@
             :style="{ maxWidth: '100vw' }"
             clear-icon="mdi-close"
             clearable
+            @click:clear="searchText = ''"
         ></v-text-field>
 
         <div
@@ -178,6 +179,7 @@
                 prepend-icon="mdi-format-title"
                 clear-icon="mdi-close"
                 clearable
+                @click:clear="newLectureModel.title = ''"
                 :style="{ maxWidth: '100vw' }"/>
 
               <v-text-field

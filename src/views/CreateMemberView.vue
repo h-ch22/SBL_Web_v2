@@ -50,6 +50,7 @@
                     prepend-inner-icon="mdi-account"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="memberData.name = ''"
                   />
 
                   <v-text-field
@@ -60,6 +61,7 @@
                     prepend-inner-icon="mdi-office-building"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="memberData.dept = ''"
                   />
 
                   <v-select
@@ -103,6 +105,7 @@
                     prepend-inner-icon="mdi-email"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="memberData.email = ''"
                   />
 
                   <v-text-field
@@ -114,6 +117,7 @@
                     prepend-inner-icon="mdi-phone"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="memberData.tel = ''"
                   />
 
                   <v-text-field
@@ -125,6 +129,7 @@
                     prepend-inner-icon="mdi-web"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="memberData.website = ''"
                   />
 
                   <v-text-field
@@ -135,6 +140,7 @@
                     prepend-inner-icon="mdi-star"
                     clear-icon="mdi-close"
                     clearable
+                    @click:clear="memberData.interests = ''"
                   />
 
                   <v-file-input

@@ -84,6 +84,7 @@
             :style="{ width: detectMobile() ? '70vw' : '22vw' }"
             clearable
             clear-icon="mdi-close"
+            @click:clear="email = ''"
           ></v-text-field>
 
           <v-text-field
@@ -96,6 +97,7 @@
             :style="{ width: detectMobile() ? '70vw' : '22vw' }"
             clearable
             clear-icon="mdi-close"
+            @click:clear="password = ''"
           ></v-text-field>
 
           <v-btn v-if="!showProgress" variant="tonal" @click="signIn">Sign In</v-btn>
