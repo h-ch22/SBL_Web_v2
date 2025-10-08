@@ -27,18 +27,29 @@
         {{ props.title }}
     </div>
 
-    <v-btn
-        v-if="isSignedIn && props.showTrailingBtn && !props.showProgress"
-        variant="tonal"
-        @click="emit('on-click')"
-    >
-        <font-awesome-icon :icon="props.trailingIcon"/>
-    </v-btn>
+    <div>
+        <v-btn
+          v-if="props.showSecondaryTrailingBtn"
+          class="mr-2"
+          variant="text"
+          @click="emit('on-secondary-btn-click')"
+        >
+          <font-awesome-icon :icon="props.secondaryTrailingIcon"/>
+      </v-btn>
 
-    <v-progress-circular
-      v-else-if="props.showProgress"
-      indeterminate
-      color="primary"/>
+      <v-btn
+          v-if="isSignedIn && props.showTrailingBtn && !props.showProgress"
+          variant="tonal"
+          @click="emit('on-click')"
+      >
+          <font-awesome-icon :icon="props.trailingIcon"/>
+      </v-btn>
+
+      <v-progress-circular
+        v-else-if="props.showProgress"
+        indeterminate
+        color="primary"/>
+    </div>
 </div>
 
 <v-divider class="mt-2 mb-2"/>
@@ -59,6 +70,14 @@ const props = defineProps({
     type: String,
     default: 'fa-solid fa-arrow-left'
   },
+  showSecondaryTrailingBtn: {
+    type: Boolean,
+    default: false
+  },
+  secondaryTrailingIcon: {
+    type: String,
+    default: 'fa-solid fa-chevron-down'
+  },
   showTrailingBtn: {
     type: Boolean,
     default: true
@@ -75,7 +94,7 @@ const props = defineProps({
 
 const isSignedIn = ref(false)
 
-const emit = defineEmits(['on-click', 'on-leading-btn-click'])
+const emit = defineEmits(['on-click', 'on-leading-btn-click', 'on-secondary-btn-click'])
 
 onAuthStateChanged(auth, () => {
   isSignedIn.value = auth.currentUser !== null

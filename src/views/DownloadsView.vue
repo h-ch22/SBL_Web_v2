@@ -7,8 +7,10 @@
       <div>
         <HeaderComponent
           :title="'Downloads'"
-          :trailing-icon="'fa-solid fa-add'"
+          :show-secondary-trailing-btn="true"
+          :secondary-trailing-icon="isExpandedAll() ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
           @on-click="router.push('/create-post')"
+          @on-secondary-btn-click="expandAll()"
         ></HeaderComponent>
       </div>
 
@@ -140,6 +142,17 @@ const searchText = ref('')
 const downloadsList = ref<Download[]>([])
 const filteredList = ref<Download[]>([])
 const isSignedIn = ref(false)
+
+function isExpandedAll () {
+  return filteredList.value.every(item => item.showContents)
+}
+
+function expandAll () {
+  const expand = !isExpandedAll()
+  filteredList.value.forEach(item => {
+    item.showContents = expand
+  })
+}
 
 function deleteItem (item: Download) {
   if (confirm(`Are you sure you want to delete post ${item.title}?\nThis action cannot be undone.`)) {

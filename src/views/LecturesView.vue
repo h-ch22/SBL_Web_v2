@@ -290,6 +290,10 @@ function filterLectures () {
   }
 }
 
+function filterYears () {
+  yearsList.value = Array.from(new Set(lecturesList.value.map(lect => lect.year))).sort((a, b) => parseInt(b) - parseInt(a))
+}
+
 function uploadLecture () {
   if (newLectureModel.value.title === '' || newLectureModel.value.year === '' || newLectureModel.value.semester === '') {
     alert('Please fill in all fields.')
@@ -313,6 +317,7 @@ function uploadLecture () {
         isEditMode.value = false
         selectedId.value = ''
         showAddModal.value = false
+        filterYears()
       })
       .catch((e: Error) => {
         console.log(e.message)
@@ -333,7 +338,7 @@ function uploadLecture () {
         } as Lecture)
 
         filterLectures()
-
+        filterYears()
         showAddModal.value = false
       })
       .catch((e: Error) => {
@@ -355,6 +360,11 @@ function deleteLecture (lect: Lecture) {
         alert('Lecture deleted successfully.')
         lecturesList.value = lecturesList.value.filter(l => l.id !== lect.id)
         filterLectures()
+        filterYears()
+
+        if (!yearsList.value.includes(selectedYear.value) && yearsList.value.length > 0) {
+          selectedYear.value = yearsList.value[0]
+        }
       })
       .catch((e: Error) => {
         console.log(e.message)
@@ -373,7 +383,7 @@ function getLectures () {
       lecturesList.value = docs.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Lecture[]
       filteredLectures.value = lecturesList.value
 
-      yearsList.value = Array.from(new Set(lecturesList.value.map(lect => lect.year)))
+      filterYears()
       selectedYear.value = yearsList.value[0]
       filterLectures()
     })

@@ -7,7 +7,10 @@
       <div>
         <HeaderComponent
           :title="getRouteName()"
+          :show-secondary-trailing-btn="true"
+          :secondary-trailing-icon="isExpandedAll() ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
           @on-click="router.push('/create-post')"
+          @on-secondary-btn-click="expandAll()"
         ></HeaderComponent>
       </div>
 
@@ -156,6 +159,17 @@ const isLoading = ref(true)
 const searchText = ref('')
 const isSignedIn = ref(false)
 let itemsQuery: Query | undefined
+
+function isExpandedAll () {
+  return filteredList.value.every(item => item.showContents)
+}
+
+function expandAll () {
+  const expand = !isExpandedAll()
+  filteredList.value.forEach(item => {
+    item.showContents = expand
+  })
+}
 
 function getRouteName (newRoute: RouteLocationNormalizedLoadedGeneric | undefined = undefined) {
   switch (newRoute ? newRoute.path : router.currentRoute.value.path) {

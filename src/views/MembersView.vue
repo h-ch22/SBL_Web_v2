@@ -5,6 +5,9 @@
         <div>
           <HeaderComponent
             :title="'Members'"
+            :show-secondary-trailing-btn="true"
+            :secondary-trailing-icon="isExpandedAll() ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
+            @on-secondary-btn-click="expandAll()"
             @on-click="router.push('/create-member')"
           />
         </div>
@@ -200,9 +203,28 @@ const isSignedIn = ref(false)
 const theme = useTheme()
 const router = useRouter()
 const searchText = ref('')
+const alwaysExpandAll = ref(false)
+
+function isExpandedAll () {
+  return filteredMembers.value.every(member => member.showCareer)
+}
+
+function expandAll () {
+  const expand = !isExpandedAll()
+  alwaysExpandAll.value = !isExpandedAll()
+  filteredMembers.value.forEach(member => {
+    member.showCareer = expand
+  })
+}
 
 function filterMembers () {
   filteredMembers.value = members.value.filter(member => member.cat === selectedOption.value)
+
+  if (alwaysExpandAll.value) {
+    filteredMembers.value.forEach(member => {
+      member.showCareer = true
+    })
+  }
 }
 
 function deleteMember (member: Member) {
