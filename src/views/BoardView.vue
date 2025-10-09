@@ -68,7 +68,7 @@
                 <div>
                   <v-card class="rounded-xl" variant="outlined">
                     <v-card-title
-                      class="text-h4 font-weight-medium mt-2"
+                      class="text-h4 font-weight-medium mt-2 rounded-xl"
                       style="word-break: break-word; white-space: normal;"
                     >
                       <v-img
@@ -144,9 +144,9 @@
       </div>
     </div>
 
-    <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow" max-width="800px">
+    <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
       <v-card class="pa-5">
-        <v-card-title style="word-break: break-word; white-space: pre-wrap;">
+        <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
           <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
             <div style="max-width: 70%; word-break: break-word; white-space: pre-wrap;">
               {{ selectedItem.title }}

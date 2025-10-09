@@ -157,9 +157,9 @@
         </v-btn>
       </div>
 
-      <v-dialog v-model="showAddModal" max-width="80vw">
+      <v-dialog v-model="showAddModal" :style="{ backdropFilter: 'blur(5px)' }">
         <v-card class="pa-4">
-            <v-card-title style="word-break: break-word; white-space: normal;">
+            <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
                 {{ isEditMode ? 'Edit Lecture' : 'Add Lecture' }}
                 <v-spacer/>

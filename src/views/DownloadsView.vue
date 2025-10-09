@@ -129,9 +129,9 @@
       </div>
       </div>
 
-      <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow" max-width="800px">
+      <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
         <v-card class="pa-5">
-          <v-card-title style="word-break: break-word; white-space: pre-wrap;">
+          <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
               <div style="max-width: 70%; word-break: break-word; white-space: pre-wrap;">
                 {{ selectedItem.title }}
@@ -151,14 +151,14 @@
               class="mt-2"
               v-model:content="selectedItem.contentsDelta"
               :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
-          </v-card-text>
 
-          <v-card-actions>
             <v-btn class="mt-2" variant="tonal" :href="selectedItem.file">
               <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
               {{ decodeURIComponent(selectedItem.file.split('%2F').pop()?.split('?')[0] ?? 'Download') }}
             </v-btn>
+          </v-card-text>
 
+          <v-card-actions>
             <v-spacer></v-spacer>
 
             <v-btn v-if="isSignedIn" @click="{

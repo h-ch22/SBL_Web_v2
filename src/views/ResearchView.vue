@@ -143,9 +143,9 @@
         </div>
       </div>
 
-      <v-dialog v-model="showAddModal">
+      <v-dialog v-model="showAddModal" :style="{ backdropFilter: 'blur(5px)' }">
         <v-card class="pa-4">
-            <v-card-title>
+            <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
                 {{ isEditMode ? 'Edit Project' : 'Add Project' }}
                 <v-spacer/>
@@ -248,9 +248,9 @@
                 </v-btn>
               </v-row>
 
-              <v-dialog v-model="showDatePicker">
+              <v-dialog v-model="showDatePicker" :style="{ backdropFilter: 'blur(5px)' }">
                 <v-card class="pa-4">
-                  <v-card-title>
+                  <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
                     <v-row :style="{ display: 'flex', alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle' }">
                       {{ datePickerType === 'begin' ? 'Select Begin Date' : 'Select End Date' }}
                       <v-spacer/>
@@ -295,10 +295,10 @@
         </v-card>
       </v-dialog>
 
-      <v-dialog v-model="showResearchModal">
+      <v-dialog v-model="showResearchModal" :style="{ backdropFilter: 'blur(5px)' }">
         <v-card class="pa-4">
-            <v-card-title>
-              <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
+            <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
+              <v-row :style="{ alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle' }">
                 {{ 'Modify Research' }}
                 <v-spacer/>
                 <v-btn variant="text" @click="showResearchModal = false" :disabled="isUploading">

@@ -183,16 +183,16 @@
         </div>
       </div>
 
-    <v-dialog v-if="showWindow && selectedMember !== null" v-model="showWindow" max-width="800px">
-      <v-card class="pa-5">
-        <v-card-title style="word-break: break-word; white-space: pre-wrap;">
+    <v-dialog v-if="showWindow && selectedMember !== null" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
+      <v-card class="pa-5" :style="{ backdropFilter: 'blur(10px)' }">
+        <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
           <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
             <div style="max-width: 70%; word-break: break-word; white-space: pre-wrap;">
               <v-chip variant="outlined" class="rounded-xl mr-2" color="primary">
-                {{ selectedMember.cat }}
+                {{ selectedMember.degree }}
               </v-chip>
 
-              {{ selectedMember.name}}
+              {{ selectedMember.name }}
             </div>
 
             <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="text" @click="selectedMember = null; showWindow = false;">
@@ -208,6 +208,10 @@
               height="40vh"
             />
           </div>
+
+          <v-chip variant="tonal" color="primary" class="rounded-xl">
+            {{ selectedMember.cat }}
+          </v-chip>
 
           <div class="mt-2" v-if="selectedMember.email !== ''">
             <font-awesome-icon icon="fa-solid fa-envelope"/>
