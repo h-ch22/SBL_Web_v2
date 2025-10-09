@@ -97,12 +97,16 @@
                           height="200px"
                         />
 
-                      <div :style="{ alignContent: 'center' }">
+                      <div :style="{ alignContent: 'center', justifyContent: 'center' }">
                           <v-chip variant="outlined" class="rounded-xl" color="primary">
                             {{ member.degree }}
                           </v-chip>
 
                           {{ member.name }}
+
+                          <v-btn variant="text" class="ml-2" @click="router.push({ path: '/publications', query: { author: member.name } })">
+                            <font-awesome-icon icon="fa-solid fa-magnifying-glass"/>
+                          </v-btn>
                         </div>
                       </v-card-title>
 
@@ -238,15 +242,22 @@
             v-model:content="selectedMember.careerDelta"
             :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
 
-          <v-btn
-            v-if="selectedMember.website !== ''"
-            style="text-transform: unset;"
-            class="mt-2"
-            variant="tonal"
-            :href="selectedMember.website">
-            <font-awesome-icon icon="fa-solid fa-link" class="mr-2"/>
-            {{ selectedMember.website }}
-          </v-btn>
+          <div>
+            <v-btn
+              v-if="selectedMember.website !== ''"
+              style="text-transform: unset;"
+              class="mt-2 mr-2"
+              variant="tonal"
+              :href="selectedMember.website">
+              <font-awesome-icon icon="fa-solid fa-link" class="mr-2"/>
+              {{ selectedMember.website }}
+            </v-btn>
+
+            <v-btn variant="tonal" class="mt-2" style="text-transform: unset;" @click="router.push({ path: '/publications', query: { author: selectedMember.name } })">
+              <font-awesome-icon class="mr-2" icon="fa-solid fa-magnifying-glass"/>
+              {{ 'Find Publications' }}
+            </v-btn>
+          </div>
         </v-card-text>
 
         <v-card-actions>

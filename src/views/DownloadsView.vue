@@ -129,7 +129,7 @@
       </div>
       </div>
 
-      <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow">
+      <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow" style="backdrop-filter: blur(5px);">
         <v-card class="pa-5">
           <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">

@@ -215,6 +215,7 @@ import { firestore as db, auth } from '@/main'
 import { collection, deleteDoc, getDocs, orderBy, query, doc, updateDoc, addDoc } from 'firebase/firestore'
 import { Publication, PublicationRequest } from '@/types/Publication'
 import { onAuthStateChanged } from 'firebase/auth'
+import router from '@/router'
 
 const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'))
 const publicationsList = ref<Publication[]>([])
@@ -327,6 +328,10 @@ onMounted(() => {
     })
     .finally(() => {
       isLoading.value = false
+
+      if (router.currentRoute.value.query.author) {
+        searchText.value = router.currentRoute.value.query.author as string
+      }
     })
 })
 
