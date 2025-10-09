@@ -184,10 +184,10 @@
       </div>
 
     <v-dialog v-if="showWindow && selectedMember !== null" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
-      <v-card class="pa-5" :style="{ backdropFilter: 'blur(10px)' }">
-        <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
+      <v-card class="pa-5">
+        <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; z-index: 1000;">
           <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <div style="max-width: 70%; word-break: break-word; white-space: pre-wrap;">
+            <div class="rounded-xl pa-2" style="max-width: 70%; word-break: break-word; white-space: pre-wrap; backdrop-filter: blur(5px);">
               <v-chip variant="outlined" class="rounded-xl mr-2" color="primary">
                 {{ selectedMember.degree }}
               </v-chip>
@@ -195,7 +195,7 @@
               {{ selectedMember.name }}
             </div>
 
-            <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="text" @click="selectedMember = null; showWindow = false;">
+            <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="tonal" @click="selectedMember = null; showWindow = false;">
               <font-awesome-icon icon="fa-solid fa-xmark"/>
             </v-btn>
           </div>
