@@ -103,10 +103,6 @@
                           </v-chip>
 
                           {{ member.name }}
-
-                          <v-btn variant="text" class="ml-2" @click="router.push({ path: '/publications', query: { author: member.name } })">
-                            <font-awesome-icon icon="fa-solid fa-magnifying-glass"/>
-                          </v-btn>
                         </div>
                       </v-card-title>
 
@@ -138,47 +134,53 @@
                           :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
                       </v-card-text>
 
-                      <v-card-actions v-if="member.website !== '' || member.career !== '' || isSignedIn">
-                        <v-btn v-if="member.career !== ''" @click="member.showCareer = !member.showCareer">
-                          <font-awesome-icon v-if="member.showCareer" icon="fa-solid fa-chevron-up"/>
-                          <font-awesome-icon v-else icon="fa-solid fa-chevron-down"/>
-                        </v-btn>
+                      <v-card-actions>
+                        <div :style="{ overflowX: 'auto' }">
+                          <v-btn v-if="member.career !== ''" @click="member.showCareer = !member.showCareer">
+                            <font-awesome-icon v-if="member.showCareer" icon="fa-solid fa-chevron-up"/>
+                            <font-awesome-icon v-else icon="fa-solid fa-chevron-down"/>
+                          </v-btn>
 
-                      <v-btn variant="text" @click="{
-                        selectedMember = member;
-                        showWindow = true;
-                      }">
-                        <font-awesome-icon icon="fa-solid fa-window-maximize"></font-awesome-icon>
-                      </v-btn>
+                          <v-btn variant="text" @click="{
+                            selectedMember = member;
+                            showWindow = true;
+                          }">
+                            <font-awesome-icon icon="fa-solid fa-window-maximize"></font-awesome-icon>
+                          </v-btn>
 
-                        <v-btn v-if="member.website !== ''" :color="theme.current.value.colors['on-background']" :href="member.website">
-                          <font-awesome-icon icon="fa-solid fa-link"></font-awesome-icon>
-                        </v-btn>
+                          <v-btn v-if="member.website !== ''" :color="theme.current.value.colors['on-background']" :href="member.website">
+                            <font-awesome-icon icon="fa-solid fa-link"></font-awesome-icon>
+                          </v-btn>
 
-                        <v-btn v-if="isSignedIn" @click="router.push({
-                          name: 'modifyMember',
-                          state: {
-                            member: {
-                              id: member.id,
-                              email: member.email ?? '',
-                              tel: member.tel ?? '',
-                              website: member.website ?? '',
-                              career: member.career ?? '',
-                              careerDelta: JSON.stringify(member.careerDelta ?? ''),
-                              cat: member.cat ?? '',
-                              degree: member.degree ?? '',
-                              dept: member.dept ?? '',
-                              name: member.name ?? '',
-                              interests: member.interests ?? ''
+                          <v-btn variant="text" @click="router.push({ path: '/publications', query: { author: member.name } })">
+                            <font-awesome-icon icon="fa-solid fa-magnifying-glass"/>
+                          </v-btn>
+
+                          <v-btn v-if="isSignedIn" @click="router.push({
+                            name: 'modifyMember',
+                            state: {
+                              member: {
+                                id: member.id,
+                                email: member.email ?? '',
+                                tel: member.tel ?? '',
+                                website: member.website ?? '',
+                                career: member.career ?? '',
+                                careerDelta: JSON.stringify(member.careerDelta ?? ''),
+                                cat: member.cat ?? '',
+                                degree: member.degree ?? '',
+                                dept: member.dept ?? '',
+                                name: member.name ?? '',
+                                interests: member.interests ?? ''
+                              }
                             }
-                          }
-                        })">
-                          <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
-                        </v-btn>
+                          })">
+                            <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
+                          </v-btn>
 
-                        <v-btn v-if="isSignedIn" color="red" @click="deleteMember(member)">
-                          <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
-                        </v-btn>
+                          <v-btn v-if="isSignedIn" color="red" @click="deleteMember(member)">
+                            <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
+                          </v-btn>
+                        </div>
                       </v-card-actions>
                   </v-card>
                 </div>
