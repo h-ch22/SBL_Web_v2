@@ -1,6 +1,13 @@
 <template>
   <v-app>
-      <v-app-bar app color="transparent" :style="{ backdropFilter: router.currentRoute.value.path === '/' ? 'blur(0px)' : 'blur(2px)'}">
+      <v-app-bar
+        app
+        color="transparent"
+        :style="{
+          backdropFilter: router.currentRoute.value.path === '/' && onVideo ?
+          'blur(0px)' :
+          'blur(2px)'
+        }">
         <v-toolbar-title>
           <v-img
             class="home-btn"
@@ -209,7 +216,7 @@ v-footer {
 </style>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { useRouter } from 'vue-router'
 import { auth, firestore as db } from './main'
@@ -221,6 +228,7 @@ const showMenu = ref(false)
 const showSignIn = ref(false)
 const isSignedIn = ref(false)
 const showProgress = ref(false)
+const onVideo = ref(true)
 const router = useRouter()
 
 const footerEmail = ref('')
@@ -337,6 +345,12 @@ watch(showSignIn, (newVal) => {
 onkeyup = (e: KeyboardEvent) => {
   if (e.key === 'Enter' && showSignIn.value) {
     signIn()
+  }
+}
+
+onscroll = () => {
+  if (router.currentRoute.value.path === '/') {
+    onVideo.value = window.scrollY < window.innerHeight
   }
 }
 
