@@ -237,6 +237,16 @@
             class="mt-2"
             v-model:content="selectedMember.careerDelta"
             :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+
+          <v-btn
+            v-if="selectedMember.website !== ''"
+            style="text-transform: unset;"
+            class="mt-2"
+            variant="tonal"
+            :href="selectedMember.website">
+            <font-awesome-icon icon="fa-solid fa-link" class="mr-2"/>
+            {{ selectedMember.website }}
+          </v-btn>
         </v-card-text>
 
         <v-card-actions>

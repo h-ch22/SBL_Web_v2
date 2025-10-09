@@ -78,7 +78,7 @@
                       v-model:content="item.contentsDelta"
                       :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
 
-                    <v-btn class="mt-2" variant="tonal" :href="item.file">
+                    <v-btn class="mt-2" variant="tonal" :href="item.file" style="text-transform: unset;">
                       <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
                       {{ decodeURIComponent(item.file.split('%2F').pop()?.split('?')[0] ?? 'Download') }}
                     </v-btn>
@@ -152,7 +152,7 @@
               v-model:content="selectedItem.contentsDelta"
               :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
 
-            <v-btn class="mt-2" variant="tonal" :href="selectedItem.file">
+            <v-btn class="mt-2" variant="tonal" :href="selectedItem.file" style="text-transform: unset;">
               <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
               {{ decodeURIComponent(selectedItem.file.split('%2F').pop()?.split('?')[0] ?? 'Download') }}
             </v-btn>
