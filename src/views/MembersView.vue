@@ -209,7 +209,7 @@
             />
           </div>
 
-          <v-chip variant="tonal" color="primary" class="rounded-xl">
+          <v-chip variant="tonal" color="primary" class="rounded-xl mt-2">
             {{ selectedMember.cat }}
           </v-chip>
 
