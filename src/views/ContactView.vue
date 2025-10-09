@@ -87,6 +87,25 @@
                 </v-btn>
               </v-row>
 
+              <div
+                v-if="contactItem?.address !== ''"
+                class="my-2 px-2"
+                :style="{ display: 'flex', flexDirection: 'row' }">
+                {{ contactItem?.address }}
+
+                <v-spacer/>
+
+                <v-btn
+                  class="ml-2"
+                  variant="outlined"
+                  style="text-transform: unset;"
+                  @click="copyToClipboard('address')"
+                >
+                  <font-awesome-icon v-if="!isAddressCopied" icon="fa-solid fa-clipboard"/>
+                  <font-awesome-icon v-else icon="fa-solid fa-clipboard-check"/>
+                </v-btn>
+              </div>
+
           </div>
         </div>
       </div>
@@ -108,6 +127,7 @@ const contactItem = ref<Contact|undefined>(undefined)
 const isLoading = ref(true)
 const isEmailCopied = ref(false)
 const isPhoneCopied = ref(false)
+const isAddressCopied = ref(false)
 const contactDocRef = doc(db, 'Contact', 'Introduction')
 const router = useRouter()
 
@@ -132,12 +152,13 @@ function getContact () {
     })
 }
 
-function copyToClipboard (type: 'tel' | 'email') {
+function copyToClipboard (type: 'tel' | 'email' | 'address') {
   if (type === 'tel' && contactItem.value?.tel) {
     navigator.clipboard.writeText(contactItem.value.tel)
       .then(() => {
         isPhoneCopied.value = true
         isEmailCopied.value = false
+        isAddressCopied.value = false
       })
       .catch((e: Error) => {
         console.log(e.message)
@@ -147,6 +168,17 @@ function copyToClipboard (type: 'tel' | 'email') {
       .then(() => {
         isEmailCopied.value = true
         isPhoneCopied.value = false
+        isAddressCopied.value = false
+      })
+      .catch((e: Error) => {
+        console.log(e.message)
+      })
+  } else if (type === 'address' && contactItem.value?.address) {
+    navigator.clipboard.writeText(contactItem.value.address)
+      .then(() => {
+        isAddressCopied.value = true
+        isPhoneCopied.value = false
+        isEmailCopied.value = false
       })
       .catch((e: Error) => {
         console.log(e.message)

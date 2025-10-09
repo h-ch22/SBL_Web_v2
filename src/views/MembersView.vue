@@ -187,6 +187,23 @@
               </v-col>
             </v-row>
         </div>
+
+        <v-card
+          class="rounded-xl mt-6 pa-3"
+          variant="outlined"
+          :style="{
+            display: 'flex',
+            flexDirection: 'column'
+          }"
+        >
+          <div>
+            {{ '이 웹사이트에 게시된 이메일 주소가 자동으로 수집되는 것을 거부하며, 이를 위반시 정보통신망법에 의해 처벌됨을 유념하시기 바랍니다.' }}
+          </div>
+
+          <div>
+            {{ 'Please note that the email addresses posted on this website are not automatically collected, and violators are subject to punishment under the Information and Communications Network Act.' }}
+          </div>
+        </v-card>
       </div>
 
     <v-dialog v-if="showWindow && selectedMember !== null" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
