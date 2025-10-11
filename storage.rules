@@ -7,7 +7,7 @@ service firebase.storage {
   match /b/{bucket}/o {
     match /banner/{fileId} {
       allow read: if true;
-      allow write, update, create, delete: if false;
+      allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
     }
 		match /news/img/{fileId}{
     	allow read: if true;
@@ -17,6 +17,10 @@ service firebase.storage {
     match /downloads/{fileId}{
       allow read: if true;
     	allow write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /private_downloads/{fileId}{
+    	allow read, write, update, create, delete: if firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.isAdmin == true;
     }
 
     match /awards/img/{fileId}{

@@ -12,6 +12,7 @@ import CreatePostView from '@/views/CreatePostView.vue'
 import ModifyContactView from '@/views/ModifyContactView.vue'
 import ResearchView from '@/views/ResearchView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
+import SettingsView from '@/views/SettingsView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -63,6 +64,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/contact',
     name: 'contact',
     component: ContactView
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: SettingsView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/create-member',

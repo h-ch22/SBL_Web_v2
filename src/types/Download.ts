@@ -7,7 +7,8 @@ export type Download = {
     contentsDelta: Delta | undefined,
     file: string,
     date: string,
-    showContents: boolean
+    showContents: boolean,
+    isPrivate: boolean
 }
 
 export type DownloadCreationRequest = {

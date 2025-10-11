@@ -52,11 +52,19 @@
 
                   <v-file-input
                     v-model="selectedFile"
-                    :prepend-icon="selectedCategory === 'Downloads' ? 'mdi-file' : 'mdi-image'"
-                    :label="isEditMode ? `Change ${selectedCategory === 'Downloads' ? 'File' : 'Image'}` : `${selectedCategory === 'Downloads' ? 'File' : 'Image'}`"
+                    :prepend-icon="selectedCategory.includes('Downloads') ? 'mdi-file' : 'mdi-image'"
+                    :label="isEditMode ? `Change ${selectedCategory.includes('Downloads') ? 'File' : 'Image'}` : `${selectedCategory.includes('Downloads') ? 'File' : 'Image'}`"
                     :accept="fileAccept"
                     variant="solo-filled"
                   ></v-file-input>
+
+                  <v-checkbox
+                    v-if="selectedCategory.includes('Downloads') && !isEditMode"
+                    v-model="isPrivate"
+                    label="Private (Only visible to signed-in users)"
+                    prepend-icon="mdi-eye-off"
+                    color="primary"
+                  ></v-checkbox>
 
                   <QuillEditor placeholder="Contents" v-model:content="contents" theme="snow" toolbar="full"/>
               </div>
@@ -72,7 +80,7 @@
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import { firestore as db, storage } from '@/main'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
@@ -84,6 +92,7 @@ const selectedFile = ref<File|null>(null)
 const showProgress = ref(false)
 const contents = ref<Delta|undefined>(undefined)
 const isEditMode = ref(false)
+const isPrivate = ref(false)
 const selectedCategory = ref('Awards')
 
 const postData = ref<CommonBoardCreateRequest>({
@@ -96,7 +105,7 @@ const categories = [
   'Awards', 'Downloads', 'Gallery', 'News'
 ]
 
-const fileAccept = computed(() => selectedCategory.value === 'Downloads' ? '' : 'image/*')
+const fileAccept = computed(() => selectedCategory.value.includes('Downloads') ? '' : 'image/*')
 
 async function upload () {
   if (postData.value.title === '' || contents.value === undefined || (!isEditMode.value && selectedFile.value === null)) {
@@ -137,7 +146,7 @@ async function upload () {
     if (selectedFile.value !== null) {
       const uploadRef = storageRef(
         storage,
-        selectedCategory.value === 'Downloads'
+        selectedCategory.value.includes('Downloads')
           ? `${selectedCategory.value.toLocaleLowerCase()}/${selectedFile.value.name}`
           : `${selectedCategory.value.toLowerCase()}/img/${docId}.${selectedFile.value.name.split('.').pop()}`
       )
@@ -150,7 +159,7 @@ async function upload () {
         .then(() => {
           getDownloadURL(uploadRef)
             .then((url) => {
-              updateDoc(doc(db, selectedCategory.value, docId), { [selectedCategory.value === 'Downloads' ? 'file' : 'image']: url })
+              updateDoc(doc(db, selectedCategory.value, docId), { [selectedCategory.value.includes('Downloads') ? 'file' : 'image']: url })
                 .catch((e: Error) => {
                   alert(`An error occurred while saving file URL.\nPlease try again later.\n(${e.message})`)
                 })
@@ -175,8 +184,25 @@ async function upload () {
   }
 }
 
+watch(isPrivate, () => {
+  if (!isEditMode.value && (selectedCategory.value === 'Downloads' || selectedCategory.value === 'Private_Downloads')) {
+    selectedCategory.value = isPrivate.value ? 'Private_Downloads' : 'Downloads'
+  }
+})
+
+watch(selectedCategory, () => {
+  if (!isEditMode.value && selectedCategory.value !== 'Private_Downloads') {
+    isPrivate.value = false
+  }
+
+  if (selectedCategory.value !== 'Private_Downloads' && selectedCategory.value !== 'Downloads') {
+    selectedFile.value = null
+  }
+})
+
 onMounted(() => {
   if (history.state.post) {
+    console.log(history.state.post)
     isEditMode.value = true
     postData.value = { ...(history.state.post as CommonBoardCreateRequest) }
     contents.value = postData.value.contents ? new Delta(JSON.parse(history.state.post.contents)) : undefined

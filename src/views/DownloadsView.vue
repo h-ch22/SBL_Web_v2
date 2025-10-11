@@ -50,7 +50,7 @@
 
         <div v-else-if="!isLoading && filteredList.length === 0" class="mt-5">
           <font-awesome-icon icon="fa-solid fa-xmark"/>
-          {{ 'No posts found' }}
+          {{ auth.currentUser !== null ? 'No posts found' : 'No posts found. Some posts are only visible when you are signed in.' }}
         </div>
 
         <v-row v-else>
@@ -68,6 +68,10 @@
 
                   <v-card-subtitle>
                     {{ item.date }}
+                    <div v-if="item.isPrivate" class="mt-2 text-caption" style="color: gray;">
+                      <font-awesome-icon icon="fa-solid fa-eye-slash" class="mr-2"/>
+                      Private
+                    </div>
                   </v-card-subtitle>
 
                   <v-card-text v-if="item.showContents">
@@ -77,6 +81,11 @@
                       class="mt-2"
                       v-model:content="item.contentsDelta"
                       :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+
+                    <div v-if="item.isPrivate" class="mt-2 text-caption" style="color: gray;">
+                      <font-awesome-icon icon="fa-solid fa-eye-slash" class="mr-2"/>
+                      This is a private post, only visible to signed-in users.
+                    </div>
 
                     <v-btn class="mt-2" variant="tonal" :href="item.file" style="text-transform: unset;">
                       <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
@@ -111,7 +120,7 @@
                             contents: item.contents,
                             title: item.title,
                             date: item.date,
-                            category: 'Downloads'
+                            category: item.isPrivate ? 'Private_Downloads' : 'Downloads',
                           }
                         }
                       })">
@@ -156,6 +165,11 @@
               <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
               {{ decodeURIComponent(selectedItem.file.split('%2F').pop()?.split('?')[0] ?? 'Download') }}
             </v-btn>
+
+            <div v-if="selectedItem.isPrivate" class="mt-2 text-caption" style="color: gray;">
+              <font-awesome-icon icon="fa-solid fa-eye-slash" class="mr-2"/>
+              This is a private post, only visible to signed-in users.
+            </div>
           </v-card-text>
 
           <v-card-actions>
@@ -171,7 +185,7 @@
                     contents: selectedItem.contents,
                     title: selectedItem.title,
                     date: selectedItem.date,
-                    category: 'Downloads'
+                    category: selectedItem.isPrivate ? 'Private_Downloads' : 'Downloads',
                   }
                 }
               });
@@ -225,10 +239,10 @@ function deleteItem (item: Download) {
     showWindow.value = false
     isLoading.value = true
 
-    deleteDoc(doc(db, 'Downloads', item.id as string))
+    deleteDoc(doc(db, item.isPrivate ? 'Private_Downloads' : 'Downloads', item.id as string))
       .then(() => {
         if (item.file !== '' && item.file !== undefined && item.file !== null) {
-          deleteObject(storageRef(storage, `downloads/${item.file.split('downloads%2F').pop()?.split('?')[0]}`))
+          deleteObject(storageRef(storage, item.isPrivate ? `private_downloads/${decodeURIComponent(item.file.split('downloads%2F').pop()?.split('?')[0] ?? '')}` : `downloads/${decodeURIComponent(item.file.split('downloads%2F').pop()?.split('?')[0] ?? '')}`))
             .catch((e: Error) => {
               alert(`An error occurred while deleting file.\nPlease try again later.\n(${e.message})`)
             })
@@ -259,7 +273,8 @@ onMounted(() => {
         ...(doc.data() as Download),
         id: doc.id,
         contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
-        showContents: false
+        showContents: false,
+        isPrivate: false
       }))
 
       filteredList.value = downloadsList.value
@@ -274,6 +289,31 @@ onMounted(() => {
 
 onAuthStateChanged(auth, () => {
   isSignedIn.value = auth.currentUser !== null
+
+  if (auth.currentUser === null) {
+    downloadsList.value = downloadsList.value.filter(item => !item.isPrivate)
+    filteredList.value = filteredList.value.filter(item => !item.isPrivate)
+  } else {
+    getDocs(query(collection(db, 'Private_Downloads'), orderBy('date', 'desc')))
+      .then((querySnapshot) => {
+        downloadsList.value.push(...querySnapshot.docs.map((doc) => ({
+          ...(doc.data() as Download),
+          id: doc.id,
+          contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
+          showContents: false,
+          isPrivate: true
+        })))
+
+        downloadsList.value.sort((a, b) => (a.date < b.date ? 1 : -1))
+        filteredList.value = downloadsList.value
+      })
+      .catch((e: Error) => {
+        console.log(e.message)
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
+  }
 })
 
 watch(searchText, () => {

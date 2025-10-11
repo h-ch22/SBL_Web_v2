@@ -22,92 +22,92 @@
           })"
         ></HeaderComponent>
       </div>
+      <div
+        :style="{
+          display: 'flex',
+          flexDirection: 'row',
+      }">
         <div
-          :style="{
-            display: 'flex',
-            flexDirection: 'row',
-        }">
-          <div
-              v-if="isLoading"
-              :style="{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100vw'
-              }"
-          >
-              <v-progress-circular
-                  indeterminate
-                  color="primary"
-              />
-          </div>
-
-          <div
-              v-else
-              class="mt-5"
-              :style="{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-              }"
-          >
-              <v-img :src="contactItem?.image" width="100%" max-width="100%"/>
-
-              <QuillEditor
-                v-if="contactItem?.contentsDelta"
-                class="mt-2"
-                v-model:content="contactItem.contentsDelta"
-                :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
-
-              <v-row class="my-2">
-                <v-btn
-                  class="mt-2 mr-2"
-                  variant="outlined"
-                  v-if="contactItem?.tel !== ''"
-                  style="text-transform: unset;"
-                  @click="copyToClipboard('tel')"
-                >
-                  {{ isPhoneCopied ? 'Copied!' : contactItem?.tel }}
-                  <font-awesome-icon v-if="!isPhoneCopied" icon="fa-solid fa-clipboard"/>
-                  <font-awesome-icon v-else icon="fa-solid fa-clipboard-check"/>
-                </v-btn>
-
-                <v-btn
-                  class="mt-2"
-                  variant="outlined"
-                  v-if="contactItem?.email !== ''"
-                  style="text-transform: unset;"
-                  @click="copyToClipboard('email')"
-                >
-                  {{ isEmailCopied ? 'Copied!' : contactItem?.email }}
-                  <font-awesome-icon v-if="!isEmailCopied" icon="fa-solid fa-clipboard"/>
-                  <font-awesome-icon v-else icon="fa-solid fa-clipboard-check"/>
-                </v-btn>
-              </v-row>
-
-              <div
-                v-if="contactItem?.address !== ''"
-                class="my-2 px-2"
-                :style="{ display: 'flex', flexDirection: 'row' }">
-                {{ contactItem?.address }}
-
-                <v-spacer/>
-
-                <v-btn
-                  class="ml-2"
-                  variant="outlined"
-                  style="text-transform: unset;"
-                  @click="copyToClipboard('address')"
-                >
-                  <font-awesome-icon v-if="!isAddressCopied" icon="fa-solid fa-clipboard"/>
-                  <font-awesome-icon v-else icon="fa-solid fa-clipboard-check"/>
-                </v-btn>
-              </div>
-
-          </div>
+            v-if="isLoading"
+            :style="{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100vw'
+            }"
+        >
+            <v-progress-circular
+                indeterminate
+                color="primary"
+            />
         </div>
+
+        <div
+            v-else
+            class="mt-5"
+            :style="{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }"
+        >
+            <v-img :src="contactItem?.image" width="100%" max-width="100%"/>
+
+            <QuillEditor
+              v-if="contactItem?.contentsDelta"
+              class="mt-2"
+              v-model:content="contactItem.contentsDelta"
+              :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+
+            <v-row class="my-2">
+              <v-btn
+                class="mt-2 mr-2"
+                variant="outlined"
+                v-if="contactItem?.tel !== ''"
+                style="text-transform: unset;"
+                @click="copyToClipboard('tel')"
+              >
+                {{ isPhoneCopied ? 'Copied!' : contactItem?.tel }}
+                <font-awesome-icon v-if="!isPhoneCopied" icon="fa-solid fa-clipboard"/>
+                <font-awesome-icon v-else icon="fa-solid fa-clipboard-check"/>
+              </v-btn>
+
+              <v-btn
+                class="mt-2"
+                variant="outlined"
+                v-if="contactItem?.email !== ''"
+                style="text-transform: unset;"
+                @click="copyToClipboard('email')"
+              >
+                {{ isEmailCopied ? 'Copied!' : contactItem?.email }}
+                <font-awesome-icon v-if="!isEmailCopied" icon="fa-solid fa-clipboard"/>
+                <font-awesome-icon v-else icon="fa-solid fa-clipboard-check"/>
+              </v-btn>
+            </v-row>
+
+            <div
+              v-if="contactItem?.address !== ''"
+              class="my-2 px-2"
+              :style="{ display: 'flex', flexDirection: 'row' }">
+              {{ contactItem?.address }}
+
+              <v-spacer/>
+
+              <v-btn
+                class="ml-2"
+                variant="outlined"
+                style="text-transform: unset;"
+                @click="copyToClipboard('address')"
+              >
+                <font-awesome-icon v-if="!isAddressCopied" icon="fa-solid fa-clipboard"/>
+                <font-awesome-icon v-else icon="fa-solid fa-clipboard-check"/>
+              </v-btn>
+            </div>
+
+        </div>
+      </div>
       </div>
     </v-container>
   </div>

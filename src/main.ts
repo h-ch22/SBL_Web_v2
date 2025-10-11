@@ -56,7 +56,11 @@ import {
   faCalendar,
   faBuilding,
   faMoneyBill,
-  faWindowMaximize
+  faWindowMaximize,
+  faGear,
+  faArrowRight,
+  faSignIn,
+  faEyeSlash
 } from '@fortawesome/free-solid-svg-icons'
 import { faLine } from '@fortawesome/free-brands-svg-icons'
 
@@ -116,7 +120,11 @@ library.add(
   faBuilding,
   faMoneyBill,
   faArrowUpRightFromSquare,
-  faWindowMaximize
+  faWindowMaximize,
+  faGear,
+  faArrowRight,
+  faSignIn,
+  faEyeSlash
 )
 
 loadFonts()

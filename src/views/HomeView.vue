@@ -2,7 +2,7 @@
   <div>
     <div id="banner-section">
       <video
-        v-if="bannerURL !== ''"
+        v-if="bannerURL !== '' && bannerType === 'Video'"
         id="banner-video"
         :src="bannerURL"
         autoplay
@@ -14,10 +14,12 @@
         webkit-playsinline
         ></video>
 
+      <v-img v-else-if="bannerURL !== '' && bannerType === 'Image'" :src="bannerURL" id="banner-video" />
+
       <v-progress-linear v-else indeterminate color="primary" :height="1"/>
 
       <v-btn
-        v-if="bannerURL !== ''"
+        v-if="bannerURL !== '' && bannerType === 'Video'"
         id="play-pause-button"
         @click="togglePlayPause"
         variant="text"
@@ -219,11 +221,23 @@ const phone = ref('')
 const email = ref('')
 const address = ref('')
 const bannerURL = ref('')
+const bannerType = ref<'Image' | 'Video'>('Video')
 
 onMounted(() => {
-  getDownloadURL(storageRef(storage, 'banner/intro_banner.mp4'))
-    .then((url) => {
-      bannerURL.value = url
+  getDoc(doc(db, 'Banner', 'Contents'))
+    .then((doc: DocumentSnapshot) => {
+      if (doc.exists()) {
+        const data = doc.data()
+        bannerType.value = data.type
+
+        getDownloadURL(storageRef(storage, `banner/${data.fileName}`))
+          .then((url) => {
+            bannerURL.value = url
+          })
+          .catch((e: Error) => {
+            console.log(e.message)
+          })
+      }
     })
     .catch((e: Error) => {
       console.log(e.message)

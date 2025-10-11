@@ -25,8 +25,9 @@
             <font-awesome-icon v-else icon="fa-solid fa-user"/>
           </v-btn>
 
-          <v-btn v-else variant="plain" @click="signOut()">
-            <font-awesome-icon icon="fa-solid fa-right-from-bracket"/>
+          <v-btn v-else variant="plain" @click="showUserInfo = !showUserInfo">
+            <font-awesome-icon v-if="showUserInfo" icon="fa-solid fa-xmark"/>
+            <font-awesome-icon v-else icon="fa-solid fa-right-from-bracket"/>
           </v-btn>
 
           <v-btn variant="plain" @click="switchTheme()">
@@ -110,6 +111,35 @@
           <v-btn v-if="!showProgress" variant="tonal" @click="signIn">Sign In</v-btn>
           <v-progress-circular
             v-else
+            indeterminate
+            color="primary"
+          />
+        </v-col>
+      </div>
+
+      <div
+        v-if="showUserInfo"
+        class="signin-menu rounded-xl elevation-14 opacity-90"
+        :style="{
+          background: theme.current.value.colors.background,
+          backdropFilter: 'blur(5px)',
+        }"
+      >
+        <v-col class="ma-4">
+          <v-row :style="{ width: detectMobile() ? '70vw' : '22vw' }">
+            <font-awesome-icon icon="fa-solid fa-user" class="mr-2"/>
+            <div class="font-weight-bold" style="word-break: break-word; white-space: normal;">{{ auth.currentUser?.email }}</div>
+          </v-row>
+
+          <v-row v-if="isAdmin" class="mt-4" :style="{ width: detectMobile() ? '70vw' : '22vw', alignItems: 'center' }">
+            <font-awesome-icon icon="fa-solid fa-check" color="green" class="mr-2"/>
+            <div style="color: green;">Administrator</div>
+          </v-row>
+
+          <v-btn v-if="!showProgress" class="mt-6" variant="tonal" @click="signOut">Sign Out</v-btn>
+          <v-progress-circular
+            v-else
+            class="mt-4"
             indeterminate
             color="primary"
           />
@@ -228,6 +258,8 @@ const theme = useTheme()
 const showMenu = ref(false)
 const showSignIn = ref(false)
 const isSignedIn = ref(false)
+const isAdmin = ref(false)
+const showUserInfo = ref(false)
 const showProgress = ref(false)
 const onVideo = ref(true)
 const router = useRouter()
@@ -320,6 +352,7 @@ function signOut () {
     auth.signOut()
       .then(() => {
         alert('Signed out successfully.')
+        showUserInfo.value = false
       })
       .catch((error: Error) => {
         alert(`An error occurred while processing sign out.\nPlease try again later.\n(${error.message})`)
@@ -334,12 +367,21 @@ function goToGithub () {
 watch(showMenu, (newVal) => {
   if (newVal) {
     showSignIn.value = false
+    showUserInfo.value = false
   }
 })
 
 watch(showSignIn, (newVal) => {
   if (newVal) {
     showMenu.value = false
+    showUserInfo.value = false
+  }
+})
+
+watch(showUserInfo, (newVal) => {
+  if (newVal) {
+    showMenu.value = false
+    showSignIn.value = false
   }
 })
 
@@ -358,8 +400,25 @@ onscroll = () => {
 onAuthStateChanged(auth, (user) => {
   if (user) {
     isSignedIn.value = true
+
+    if (!menuItems.value.find(item => item.href === 'settings')) {
+      menuItems.value.push({
+        href: 'settings',
+        title: 'Settings',
+        icon: 'fa-gear'
+      })
+    }
+
+    getDoc(doc(db, 'Users', auth.currentUser!.uid))
+      .then((doc: DocumentSnapshot) => {
+        if (doc.exists()) {
+          const data = doc.data()
+          isAdmin.value = data.isAdmin
+        }
+      })
   } else {
     isSignedIn.value = false
+    menuItems.value = menuItems.value.filter(item => item.href !== 'settings')
   }
 })
 
