@@ -1,24 +1,18 @@
-# sbl_web_v2
+<img src="README/Mockup_SBL_Web_v2.png"><br>
+<img src="README/ic_SBL.png"><br>
+SBL Web v2<br>
+=
+> An official website for Smart Biophotonics Lab., Jeonbuk National University. Fast, stable, and beautiful, rebuilt with Vue.<br>
 
-## Project setup
-```
-npm install
-```
+ⓒ 2025 Changjin Ha. All Rights Reserved.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## 🛠️ Technologies
+<img src="https://img.shields.io/badge/Vue-4FC08D?style=flat-square&logo=Vue.js&logoColor=white">
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=TypeScript&logoColor=white"/><br>
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 📱 Products
+<div>
+<a href="https://sbl-web.web.app">
+    <img src="https://img.shields.io/badge/Visit-Website-blue?style=flat&logo=Google%20Chrome&logoColor=white"/>
+</a>
+</div>
