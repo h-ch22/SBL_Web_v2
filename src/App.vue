@@ -414,6 +414,8 @@ onAuthStateChanged(auth, (user) => {
         if (doc.exists()) {
           const data = doc.data()
           isAdmin.value = data.isAdmin
+        } else {
+          isAdmin.value = false
         }
       })
   } else {

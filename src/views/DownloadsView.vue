@@ -68,7 +68,7 @@
 
                   <v-card-subtitle>
                     {{ item.date }}
-                    <div v-if="item.isPrivate" class="mt-2 text-caption" style="color: gray;">
+                    <div v-if="item.isPrivate && !item.showContents" class="mt-2 text-caption" style="color: gray;">
                       <font-awesome-icon icon="fa-solid fa-eye-slash"/>
                       Private
                     </div>

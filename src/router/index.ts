@@ -122,6 +122,11 @@ const router = createRouter({
         left: 0,
         top: 0
       }
+    } else {
+      return {
+        top: 0,
+        left: 0
+      }
     }
   }
 })

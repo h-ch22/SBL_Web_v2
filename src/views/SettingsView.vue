@@ -37,7 +37,7 @@
                                 @click="changePassword"
                                 color="primary"
                                 variant="tonal"
-                                :disabled="!validate()">
+                                :disabled="!isValidPassword || newPassword !== confirmPassword">
                                 <font-awesome-icon icon="fa-solid fa-check"></font-awesome-icon>
                             </v-btn>
                         </div>
@@ -87,7 +87,7 @@
                                 @click="createUser"
                                 color="primary"
                                 variant="tonal"
-                                :disabled="!validate(true)">
+                                :disabled="!isValidPasswordToCreate || passwordToCreate !== confirmPasswordToCreate || email === '' || !email.includes('@')">
                                 <font-awesome-icon icon="fa-solid fa-check"></font-awesome-icon>
                             </v-btn>
                         </div>
@@ -269,7 +269,7 @@
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { deleteObject, ref as storageRef, uploadBytes } from 'firebase/storage'
-import { updatePassword, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
+import { updatePassword, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, validatePassword } from 'firebase/auth'
 import { ref, watch } from 'vue'
 import { firestore as db, storage, auth } from '@/main'
 
@@ -288,14 +288,12 @@ const loadingItem = ref('')
 const isLoggingIn = ref(false)
 
 const isAdmin = ref(false)
-const panel = ref([0])
+const isValidPassword = ref(false)
+const isValidPasswordToCreate = ref(false)
+const panel = ref<number[] | number>([0])
 const bannerType = ref('Video')
 const selectedBanner = ref<File|null>(null)
 const showSignInDialog = ref(false)
-
-function validate (createUser = false) {
-  return createUser ? passwordToCreate.value.length >= 8 && passwordToCreate.value === confirmPasswordToCreate.value && email.value !== '' && email.value.includes('@') : newPassword.value.length >= 8 && newPassword.value === confirmPassword.value
-}
 
 function changePassword () {
   loadingItem.value = 'changePassword'
@@ -341,29 +339,51 @@ function signIn () {
 
   signInWithEmailAndPassword(auth, adminEmail.value, adminPassword.value)
     .then(() => {
-      setDoc(doc(db, 'Users', uidToCreate.value), {
-        isAdmin: isAdmin.value
-      }).then(() => {
-        alert('User privileges have been elevated.')
-        email.value = ''
-        passwordToCreate.value = ''
-        confirmPasswordToCreate.value = ''
-        isAdmin.value = false
+      getDoc(doc(db, 'Users', auth.currentUser!.uid)).then((docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data()
+          if (!data.isAdmin) {
+            alert('The account you signed in with does not have administrator rights.')
+          } else {
+            grantAdminRights()
+          }
+        } else {
+          alert('The account you signed in with does not have administrator rights.')
+        }
+      }).catch((e: Error) => {
+        alert(`An error occured while verifying admin rights: ${e.message}`)
+        isLoggingIn.value = false
+      }).finally(() => {
         adminEmail.value = ''
         adminPassword.value = ''
-        uidToCreate.value = ''
         isLoggingIn.value = false
-        showSignInDialog.value = false
-      }).catch((e: Error) => {
-        alert(`An error occured while creating the user document: ${e.message}`)
-      }).finally(() => {
-        loadingItem.value = ''
       })
     })
     .catch((e: Error) => {
       alert(`An error occured while signing in: ${e.message}`)
       isLoggingIn.value = false
     })
+}
+
+function grantAdminRights () {
+  setDoc(doc(db, 'Users', uidToCreate.value), {
+    isAdmin: isAdmin.value
+  }).then(() => {
+    alert('User privileges have been elevated.')
+    email.value = ''
+    passwordToCreate.value = ''
+    confirmPasswordToCreate.value = ''
+    isAdmin.value = false
+    adminEmail.value = ''
+    adminPassword.value = ''
+    uidToCreate.value = ''
+    isLoggingIn.value = false
+    showSignInDialog.value = false
+  }).catch((e: Error) => {
+    alert(`An error occured while creating the user document: ${e.message}`)
+  }).finally(() => {
+    loadingItem.value = ''
+  })
 }
 
 function closeSignInDialog () {
@@ -442,11 +462,25 @@ function changeBanner () {
 onkeyup = (e: KeyboardEvent) => {
   if (e.key === 'Enter' && showSignInDialog.value && (adminEmail.value !== '' && adminPassword.value !== '')) {
     signIn()
+  } else if (e.key === 'Enter' && !showSignInDialog.value && newPassword.value === confirmPassword.value && isValidPassword.value && (panel.value === 0 || panel.value[0] === 0)) {
+    changePassword()
+  } else if (e.key === 'Enter' && !showSignInDialog.value && email.value.includes('@') && passwordToCreate.value === confirmPasswordToCreate.value && isValidPasswordToCreate.value && panel.value === 1) {
+    createUser()
   }
 }
 
-watch([newPassword, confirmPassword], () => {
-  validate()
+watch(newPassword, () => {
+  validatePassword(auth, newPassword.value)
+    .then(status => {
+      isValidPassword.value = status.isValid
+    })
+})
+
+watch(passwordToCreate, () => {
+  validatePassword(auth, passwordToCreate.value)
+    .then(status => {
+      isValidPasswordToCreate.value = status.isValid
+    })
 })
 
 watch(bannerType, () => {
@@ -466,7 +500,7 @@ watch(showSignInDialog, (newVal) => {
 })
 
 onAuthStateChanged(auth, (user) => {
-  if (user === null) {
+  if (user === null && !showSignInDialog.value) {
     window.location.reload()
   }
 })
