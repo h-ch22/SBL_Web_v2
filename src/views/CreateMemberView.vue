@@ -165,7 +165,7 @@
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import { useTheme } from 'vuetify/lib/composables/theme'
-import { firestore as db, storage } from '@/main'
+import { firestore as db, storage, auth } from '@/main'
 import { onMounted, ref } from 'vue'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import { MemberCreateRequest } from '@/types/Member'
@@ -174,6 +174,7 @@ import { MemberDegreeType } from '@/enums/MemberDegreeType'
 import { addDoc, collection, doc, DocumentReference, updateDoc } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { useRouter } from 'vue-router'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const panel = ref([0])
 const theme = useTheme()
@@ -285,6 +286,12 @@ onMounted(() => {
     isEditMode.value = true
     memberData.value = { ...(history.state.member as MemberCreateRequest) }
     career.value = memberData.value.career ? new Delta(JSON.parse(history.state.member.careerDelta)) : undefined
+  }
+})
+
+onAuthStateChanged(auth, (user) => {
+  if (user === null) {
+    window.location.reload()
   }
 })
 

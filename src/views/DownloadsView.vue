@@ -69,7 +69,7 @@
                   <v-card-subtitle>
                     {{ item.date }}
                     <div v-if="item.isPrivate" class="mt-2 text-caption" style="color: gray;">
-                      <font-awesome-icon icon="fa-solid fa-eye-slash" class="mr-2"/>
+                      <font-awesome-icon icon="fa-solid fa-eye-slash"/>
                       Private
                     </div>
                   </v-card-subtitle>
@@ -83,7 +83,7 @@
                       :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
 
                     <div v-if="item.isPrivate" class="mt-2 text-caption" style="color: gray;">
-                      <font-awesome-icon icon="fa-solid fa-eye-slash" class="mr-2"/>
+                      <font-awesome-icon icon="fa-solid fa-eye-slash"/>
                       This is a private post, only visible to signed-in users.
                     </div>
 
@@ -167,7 +167,7 @@
             </v-btn>
 
             <div v-if="selectedItem.isPrivate" class="mt-2 text-caption" style="color: gray;">
-              <font-awesome-icon icon="fa-solid fa-eye-slash" class="mr-2"/>
+              <font-awesome-icon icon="fa-solid fa-eye-slash"/>
               This is a private post, only visible to signed-in users.
             </div>
           </v-card-text>
@@ -283,7 +283,9 @@ onMounted(() => {
       console.log(e.message)
     })
     .finally(() => {
-      isLoading.value = false
+      if (!isSignedIn.value) {
+        isLoading.value = false
+      }
     })
 })
 

@@ -84,7 +84,8 @@
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import ImageUploader from 'quill-image-uploader'
 import HeaderComponent from '@/components/HeaderComponent.vue'
-import { firestore as db, storage } from '@/main'
+import { firestore as db, storage, auth } from '@/main'
+import { onAuthStateChanged } from 'firebase/auth'
 import { onMounted, ref } from 'vue'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import { doc, setDoc, updateDoc } from 'firebase/firestore'
@@ -203,4 +204,9 @@ onMounted(() => {
   }
 })
 
+onAuthStateChanged(auth, (user) => {
+  if (user === null) {
+    window.location.reload()
+  }
+})
 </script>

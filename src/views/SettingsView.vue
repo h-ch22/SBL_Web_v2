@@ -269,7 +269,7 @@
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { deleteObject, ref as storageRef, uploadBytes } from 'firebase/storage'
-import { updatePassword, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { updatePassword, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 import { ref, watch } from 'vue'
 import { firestore as db, storage, auth } from '@/main'
 
@@ -462,6 +462,12 @@ watch(showSignInDialog, (newVal) => {
       adminEmail.value = ''
       adminPassword.value = ''
     }
+  }
+})
+
+onAuthStateChanged(auth, (user) => {
+  if (user === null) {
+    window.location.reload()
   }
 })
 </script>

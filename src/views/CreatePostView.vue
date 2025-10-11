@@ -79,7 +79,8 @@
 <script lang="ts" setup>
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import HeaderComponent from '@/components/HeaderComponent.vue'
-import { firestore as db, storage } from '@/main'
+import { firestore as db, storage, auth } from '@/main'
+import { onAuthStateChanged } from 'firebase/auth'
 import { onMounted, ref, computed, watch } from 'vue'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore'
@@ -220,6 +221,12 @@ onMounted(() => {
       alert('Invalid access.')
       router.back()
     }
+  }
+})
+
+onAuthStateChanged(auth, (user) => {
+  if (user === null) {
+    window.location.reload()
   }
 })
 
