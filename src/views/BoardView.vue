@@ -64,7 +64,7 @@
           </div>
 
           <v-row v-else>
-            <v-col class="mt-5" v-for="item in filteredList" :key="item.id">
+            <v-col xs="12" sm="12" md="6" lg="4" xl="3" xxl="3" class="mt-5" v-for="item in filteredList" :key="item.id">
                 <div>
                   <v-card class="rounded-xl" variant="outlined">
                     <v-card-title

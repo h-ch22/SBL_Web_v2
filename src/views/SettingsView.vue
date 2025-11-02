@@ -126,8 +126,15 @@
 
                         <v-checkbox v-model="isAdmin" label="Admin" color="primary" hide-details></v-checkbox>
 
-                        <div class="text-caption">
+                        <div class="text-caption" :style='{ verticalAlign: "middle", justifyContent: "center" }'>
                             {{ 'Granting Admin rights allows you to write posts or make changes to the site using the account you created.\nThis task requires an administrator account.' }}
+
+                            <v-btn variant="icon">
+                              <font-awesome-icon
+                                icon="fa-solid fa-circle-info"
+                                @click="showUserTypeDescriptionWindow = true"
+                            ></font-awesome-icon>
+                            </v-btn>
                         </div>
                     </div>
                 </v-expansion-panel-text>
@@ -161,6 +168,75 @@
                         </div>
                     </div>
                 </v-expansion-panel-text>
+
+                <v-dialog v-if="showUserTypeDescriptionWindow" v-model="showUserTypeDescriptionWindow" :style="{ backdropFilter: 'blur(5px)' }">
+                  <v-card class="pa-5">
+                    <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; z-index: 1000;">
+                      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div class="rounded-xl pa-2" style="max-width: 70%; word-break: break-word; white-space: pre-wrap; backdrop-filter: blur(5px);">
+                          Site Permissions by User Type
+                        </div>
+
+                        <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="tonal" @click="showUserTypeDescriptionWindow = false">
+                          <font-awesome-icon icon="fa-solid fa-xmark"/>
+                        </v-btn>
+                      </div>
+                    </v-card-title>
+
+                    <v-card-text>
+                      <v-table>
+                        <thead>
+                          <tr>
+                            <th class="text-left">
+                              Feature
+                            </th>
+
+                            <th class="text-left">
+                              Administrator
+                            </th>
+
+                            <th class="text-left">
+                              Standard User
+                            </th>
+
+                            <th class="text-left">
+                              Guest(Non-Signed In)
+                            </th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          <tr
+                            v-for="feature in featuresByUserType"
+                            :key="feature.feature"
+                          >
+                            <td>{{ feature.feature }}</td>
+                            <td>
+                              <font-awesome-icon
+                                :icon="feature.admin ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"
+                                :color="feature.admin ? 'green' : 'red'"
+                              ></font-awesome-icon>
+                            </td>
+
+                            <td>
+                              <font-awesome-icon
+                                :icon="feature.standard ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"
+                                :color="feature.standard ? 'green' : 'red'"
+                              ></font-awesome-icon>
+                            </td>
+
+                            <td>
+                              <font-awesome-icon
+                                :icon="feature.guest ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"
+                                :color="feature.guest ? 'green' : 'red'"
+                              ></font-awesome-icon>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </v-table>
+                    </v-card-text>
+                  </v-card>
+                </v-dialog>
             </v-expansion-panel>
 
             <v-expansion-panel
@@ -288,11 +364,125 @@ const loadingItem = ref('')
 const isLoggingIn = ref(false)
 
 const isAdmin = ref(false)
+const showUserTypeDescriptionWindow = ref(false)
+const featuresByUserType = ref([
+  {
+    feature: 'Read Posts (Awards, News, Gallery)',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'View Members',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'View Lectures',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'View Publications',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'View Contact',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'View Downloads (Public only)',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'View Research/Projects',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'View Banners, Homescreen',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'Withdraw / Update Password',
+    admin: true,
+    standard: true,
+    guest: true
+  },
+  {
+    feature: 'View Private Downloads',
+    admin: true,
+    standard: true,
+    guest: false
+  },
+  {
+    feature: 'Create/Modify/Delete Posts (Awards, News, Gallery)',
+    admin: true,
+    standard: false,
+    guest: false
+  },
+  {
+    feature: 'Create/Modify/Delete Members',
+    admin: true,
+    standard: false,
+    guest: false
+  },
+  {
+    feature: 'Update Lectures',
+    admin: true,
+    standard: false,
+    guest: false
+  },
+  {
+    feature: 'Add/Update/Delete Publications',
+    admin: true,
+    standard: false,
+    guest: false
+  },
+  {
+    feature: 'Update Contact',
+    admin: true,
+    standard: false,
+    guest: false
+  },
+  {
+    feature: 'Create/Update/Delete Downloads and Private Downloads',
+    admin: true,
+    standard: false,
+    guest: false
+  },
+  {
+    feature: 'Update Research/Projects',
+    admin: true,
+    standard: false,
+    guest: false
+  },
+  {
+    feature: 'Update Site Settings (Banner, Create Accounts)',
+    admin: true,
+    standard: false,
+    guest: false
+  }
+])
+
 const isValidPassword = ref(false)
 const isValidPasswordToCreate = ref(false)
+
 const panel = ref<number[] | number>([0])
 const bannerType = ref('Video')
 const selectedBanner = ref<File|null>(null)
+
 const showSignInDialog = ref(false)
 
 function changePassword () {

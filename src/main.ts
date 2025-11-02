@@ -60,7 +60,8 @@ import {
   faGear,
   faArrowRight,
   faSignIn,
-  faEyeSlash
+  faEyeSlash,
+  faInfoCircle
 } from '@fortawesome/free-solid-svg-icons'
 import { faLine } from '@fortawesome/free-brands-svg-icons'
 
@@ -124,7 +125,10 @@ library.add(
   faGear,
   faArrowRight,
   faSignIn,
-  faEyeSlash
+  faEyeSlash,
+  faInfoCircle,
+  faCheck,
+  faXmark
 )
 
 loadFonts()
