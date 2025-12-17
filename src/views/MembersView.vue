@@ -201,7 +201,7 @@
               {{ selectedMember.name }}
             </div>
 
-            <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="tonal" @click="selectedMember = null; showWindow = false;">
+            <v-btn style="margin-left: 16px; flex-shrink: 0;" color="red" variant="tonal" @click="selectedMember = null; showWindow = false;">
               <font-awesome-icon icon="fa-solid fa-xmark"/>
             </v-btn>
           </div>

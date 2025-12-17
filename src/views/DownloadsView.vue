@@ -145,7 +145,7 @@
               <div class="rounded-xl pa-2" style="max-width: 70%; word-break: break-word; white-space: pre-wrap; backdrop-filter: blur(5px);">
                 {{ selectedItem.title }}
               </div>
-              <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="tonal" @click="selectedItem = null; showWindow = false;">
+              <v-btn style="margin-left: 16px; flex-shrink: 0;" color="red" variant="tonal" @click="selectedItem = null; showWindow = false;">
                 <font-awesome-icon icon="fa-solid fa-xmark"/>
               </v-btn>
             </div>

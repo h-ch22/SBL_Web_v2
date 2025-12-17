@@ -149,7 +149,7 @@
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
                 {{ isEditMode ? 'Edit Project' : 'Add Project' }}
                 <v-spacer/>
-                <v-btn variant="text" @click="showAddModal = false" :disabled="isUploading">
+                <v-btn variant="text" color="red" @click="showAddModal = false" :disabled="isUploading">
                   <font-awesome-icon icon="fa-solid fa-xmark"/>
                 </v-btn>
               </v-row>
@@ -254,7 +254,7 @@
                     <v-row :style="{ display: 'flex', alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle' }">
                       {{ datePickerType === 'begin' ? 'Select Begin Date' : 'Select End Date' }}
                       <v-spacer/>
-                      <v-btn variant="text" @click="showDatePicker = false">
+                      <v-btn variant="text" color="red" @click="showDatePicker = false">
                         <font-awesome-icon icon="fa-solid fa-xmark"/>
                       </v-btn>
                     </v-row>
@@ -301,7 +301,7 @@
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle' }">
                 {{ 'Modify Research' }}
                 <v-spacer/>
-                <v-btn variant="text" @click="showResearchModal = false" :disabled="isUploading">
+                <v-btn variant="text" color="red" @click="showResearchModal = false" :disabled="isUploading">
                   <font-awesome-icon icon="fa-solid fa-xmark"/>
                 </v-btn>
               </v-row>

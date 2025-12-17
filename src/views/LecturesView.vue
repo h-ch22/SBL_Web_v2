@@ -163,7 +163,7 @@
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
                 {{ isEditMode ? 'Edit Lecture' : 'Add Lecture' }}
                 <v-spacer/>
-                <v-btn variant="text" @click="showAddModal = false" :disabled="isUploading">
+                <v-btn variant="text" @click="showAddModal = false" color="red" :disabled="isUploading">
                   <font-awesome-icon icon="fa-solid fa-xmark"/>
                 </v-btn>
               </v-row>

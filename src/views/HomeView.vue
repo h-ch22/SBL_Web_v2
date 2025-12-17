@@ -54,7 +54,12 @@
                 width="200px"
                 height="300px"/>
 
+              <div class="news-title" @click="
+                selectedNews = news,
+                showWindow = true
+              ">
                 {{ news.title }}
+              </div>
             </v-card-title>
             <v-card-subtitle> {{ news.date }} </v-card-subtitle>
           </v-card>
@@ -143,6 +148,65 @@
     </v-container>
   </div>
 
+  <v-dialog v-if="showWindow && selectedNews !== undefined" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
+    <v-card class="pa-5">
+      <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; z-index: 1000;">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <div class="rounded-xl pa-2" style="max-width: 70%; word-break: break-word; white-space: pre-wrap; backdrop-filter: blur(5px);">
+            {{ selectedNews.title }}
+          </div>
+          <v-btn style="margin-left: 16px; flex-shrink: 0;" color="red" variant="tonal" @click="selectedNews = undefined; showWindow = false;">
+            <font-awesome-icon icon="fa-solid fa-xmark"/>
+          </v-btn>
+        </div>
+      </v-card-title>
+
+      <v-card-subtitle>
+        {{ selectedNews.date }}
+      </v-card-subtitle>
+
+      <v-card-text>
+        <div v-if="selectedNews.image !== '' && selectedNews.image !== undefined && selectedNews.image !== null">
+          <v-img
+            :src="selectedNews.image"
+            height="40vh"
+          />
+        </div>
+
+        <QuillEditor
+          class="mt-2"
+          v-model:content=" selectedNews.contentsDelta"
+          :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer></v-spacer>
+
+        <v-btn v-if="isSignedIn" @click="{
+          showWindow = false;
+          router.push({
+            name: 'modifyPost',
+            state: {
+              post: {
+                id: selectedNews.id,
+                contents: selectedNews.contents,
+                title: selectedNews.title,
+                date: selectedNews.date,
+                category: 'News'
+              }
+            }
+          });
+        }">
+          <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
+        </v-btn>
+
+        <v-btn v-if="isSignedIn" color="red" @click="deleteItem(selectedNews)">
+          <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
 </template>
 
 <style>
@@ -191,6 +255,11 @@
   padding-bottom: 8px;
 }
 
+.news-title:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .center-aligned-div {
   display: flex;
   justify-content: center;
@@ -199,23 +268,33 @@
 </style>
 
 <script setup lang="ts">
-import { collection, doc, DocumentSnapshot, getDocs, getDoc, limit, orderBy, query } from 'firebase/firestore'
-import { ref as storageRef, getDownloadURL } from 'firebase/storage'
-import { ref, onMounted } from 'vue'
+import { collection, doc, DocumentSnapshot, getDocs, getDoc, limit, orderBy, query, deleteDoc } from 'firebase/firestore'
+import { ref as storageRef, getDownloadURL, deleteObject } from 'firebase/storage'
+import { ref, onMounted, watch } from 'vue'
 import { useTheme } from 'vuetify'
-import { firestore as db, storage } from '@/main'
-import { News } from '@/types/News'
+import { firestore as db, storage, auth } from '@/main'
 import { Publication } from '@/types/Publication'
+import { Delta, QuillEditor } from '@vueup/vue-quill'
+import { onAuthStateChanged } from 'firebase/auth'
+import { CommonBoardItem } from '@/types/CommonBoardItem'
+
+import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import router from '@/router'
+
 const theme = useTheme()
 
 const isPlaying = ref(true)
+const isSignedIn = ref(false)
+const showWindow = ref(false)
+const isLoading = ref(false)
+
+const selectedNews = ref<CommonBoardItem | undefined>(undefined)
 
 const newsQuery = query(collection(db, 'News'), orderBy('date', 'desc'), limit(5))
 const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'), limit(5))
 const contactRef = doc(db, 'Contact', 'Introduction')
 
-const newsList = ref<News[]>([])
+const newsList = ref<CommonBoardItem[]>([])
 const publicationList = ref<Publication[]>([])
 const phone = ref('')
 const email = ref('')
@@ -245,15 +324,12 @@ onMounted(() => {
 
   getDocs(newsQuery)
     .then((docs) => {
-      docs.forEach((doc) => {
-        newsList.value.push({
-          id: doc.id,
-          contents: doc.data().contents,
-          date: doc.data().date,
-          image: doc.data().image,
-          title: doc.data().title
-        })
-      })
+      newsList.value = docs.docs.map((doc) => ({
+        ...(doc.data() as CommonBoardItem),
+        id: doc.id,
+        contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
+        showContents: false
+      }))
     })
     .catch((e: Error) => {
       console.log(e.message)
@@ -319,4 +395,43 @@ function openMap () {
   const query = encodeURIComponent(address.value)
   window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
 }
+
+function deleteItem (item: CommonBoardItem) {
+  if (confirm(`Are you sure you want to delete post ${item.title}?\nThis action cannot be undone.`)) {
+    showWindow.value = false
+    isLoading.value = true
+    deleteDoc(doc(db, 'News', item.id as string))
+      .then(() => {
+        if (item.image !== '' && item.image !== undefined && item.image !== null) {
+          deleteObject(storageRef(storage, `news/img/${item.id}.${item.image.split('.').pop()?.split('?')[0]}`))
+            .catch((e: Error) => {
+              alert(`An error occurred while deleting image.\nPlease try again later.\n(${e.message})`)
+            })
+            .finally(() => {
+              alert('Post deleted successfully.')
+              newsList.value = newsList.value.filter(i => i.id !== item.id)
+              isLoading.value = false
+            })
+        } else {
+          alert('Post deleted successfully.')
+          newsList.value = newsList.value.filter(i => i.id !== item.id)
+          isLoading.value = false
+        }
+      })
+      .catch((e: Error) => {
+        alert(`An error occurred while deleting post.\nPlease try again later.\n(${e.message})`)
+        isLoading.value = false
+      })
+  }
+}
+
+onAuthStateChanged(auth, () => {
+  isSignedIn.value = auth.currentUser !== null
+})
+
+watch(showWindow, () => {
+  if (!showWindow.value) {
+    selectedNews.value = undefined
+  }
+})
 </script>

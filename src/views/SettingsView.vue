@@ -129,7 +129,7 @@
                         <div class="text-caption" :style='{ verticalAlign: "middle", justifyContent: "center" }'>
                             {{ 'Granting Admin rights allows you to write posts or make changes to the site using the account you created.\nThis task requires an administrator account.' }}
 
-                            <v-btn variant="icon">
+                            <v-btn variant="text">
                               <font-awesome-icon
                                 icon="fa-solid fa-circle-info"
                                 @click="showUserTypeDescriptionWindow = true"
@@ -177,7 +177,7 @@
                           Site Permissions by User Type
                         </div>
 
-                        <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="tonal" @click="showUserTypeDescriptionWindow = false">
+                        <v-btn color="red" style="margin-left: 16px; flex-shrink: 0;" variant="tonal" @click="showUserTypeDescriptionWindow = false">
                           <font-awesome-icon icon="fa-solid fa-xmark"/>
                         </v-btn>
                       </div>
@@ -291,7 +291,7 @@
           <font-awesome-icon icon="fa-solid fa-sign-in" style="margin-right: 8px;"/>
           {{ 'Sign In' }}
         </div>
-        <v-btn style="margin-left: 16px; flex-shrink: 0;" variant="tonal" @click="closeSignInDialog">
+        <v-btn color="red" style="margin-left: 16px; flex-shrink: 0;" variant="tonal" @click="closeSignInDialog">
           <font-awesome-icon icon="fa-solid fa-xmark"/>
         </v-btn>
       </div>
