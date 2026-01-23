@@ -27,21 +27,7 @@
           display: 'flex',
           flexDirection: 'row',
       }">
-        <div
-            v-if="isLoading"
-            :style="{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100vw'
-            }"
-        >
-            <v-progress-circular
-                indeterminate
-                color="primary"
-            />
-        </div>
+        <CommonProgress v-if="isLoading" />
 
         <div
             v-else
@@ -87,6 +73,18 @@
               </v-btn>
             </v-row>
 
+            <GoogleMap
+              :api-key="apiKey"
+              style="width: 100%; height: 50vh"
+              :center="coords"
+              :zoom=15
+              language="en"
+            >
+              <MarkerCluster>
+                <Marker :options="{ position: coords }" />
+              </MarkerCluster>
+          </GoogleMap>
+
             <div
               v-if="contactItem?.address !== ''"
               class="my-2 px-2"
@@ -105,7 +103,6 @@
                 <font-awesome-icon v-else icon="fa-solid fa-clipboard-check"/>
               </v-btn>
             </div>
-
         </div>
       </div>
       </div>
@@ -114,22 +111,38 @@
 </template>
 
 <script lang="ts" setup>
-import HeaderComponent from '@/components/HeaderComponent.vue'
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import { firestore as db } from '@/main'
 import { Contact } from '@/types/Contact'
 import { getDoc, doc } from 'firebase/firestore'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
+import { GoogleMap, Marker, MarkerCluster } from 'vue3-google-map'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import CommonProgress from '@/components/common/CommonProgress.vue'
 
 const contactItem = ref<Contact|undefined>(undefined)
 const isLoading = ref(true)
 const isEmailCopied = ref(false)
 const isPhoneCopied = ref(false)
 const isAddressCopied = ref(false)
+const coords = computed(() => {
+  if (contactItem.value?.latLng) {
+    return {
+      lat: Number(contactItem.value.latLng.split('N')[0]),
+      lng: Number(contactItem.value.latLng.split('N')[1].split('E')[0])
+    }
+  } else {
+    return {
+      lat: 35.846595,
+      lng: 127.132532
+    }
+  }
+})
 const contactDocRef = doc(db, 'Contact', 'Introduction')
 const router = useRouter()
+const apiKey = ref(process.env.VUE_APP_GOOGLE_MAPS_API_KEY)
 
 function getContact () {
   isLoading.value = true

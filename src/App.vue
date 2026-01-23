@@ -247,22 +247,25 @@ v-footer {
 </style>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { useRouter } from 'vue-router'
 import { auth, firestore as db } from './main'
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth'
 import { doc, DocumentSnapshot, getDoc } from 'firebase/firestore'
+import { useAuthStore } from './stores/AuthStateStore'
+import { storeToRefs } from 'pinia'
 
 const theme = useTheme()
+const router = useRouter()
+const { setAuthState, setAdminState } = useAuthStore()
+const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
+
 const showMenu = ref(false)
 const showSignIn = ref(false)
-const isSignedIn = ref(false)
-const isAdmin = ref(false)
 const showUserInfo = ref(false)
 const showProgress = ref(false)
 const onVideo = ref(true)
-const router = useRouter()
 
 const footerEmail = ref('')
 const footerAddress = ref('')
@@ -351,6 +354,8 @@ function signOut () {
   if (confirm('Are you sure you want to sign out?')) {
     auth.signOut()
       .then(() => {
+        setAuthState(false)
+        setAdminState(false)
         alert('Signed out successfully.')
         showUserInfo.value = false
       })
@@ -399,7 +404,7 @@ onscroll = () => {
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    isSignedIn.value = true
+    setAuthState(true)
 
     if (!menuItems.value.find(item => item.href === 'settings')) {
       menuItems.value.push({
@@ -413,13 +418,14 @@ onAuthStateChanged(auth, (user) => {
       .then((doc: DocumentSnapshot) => {
         if (doc.exists()) {
           const data = doc.data()
-          isAdmin.value = data.isAdmin
+          setAdminState(data.isAdmin)
         } else {
-          isAdmin.value = false
+          setAdminState(false)
         }
       })
   } else {
-    isSignedIn.value = false
+    setAuthState(false)
+    setAdminState(false)
     menuItems.value = menuItems.value.filter(item => item.href !== 'settings')
   }
 })

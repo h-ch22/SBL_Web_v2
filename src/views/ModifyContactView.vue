@@ -83,7 +83,7 @@
 <script lang="ts" setup>
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import ImageUploader from 'quill-image-uploader'
-import HeaderComponent from '@/components/HeaderComponent.vue'
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import { firestore as db, storage, auth } from '@/main'
 import { onAuthStateChanged } from 'firebase/auth'
 import { onMounted, ref } from 'vue'

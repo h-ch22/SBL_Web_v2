@@ -64,6 +64,7 @@ import {
   faInfoCircle
 } from '@fortawesome/free-solid-svg-icons'
 import { faLine } from '@fortawesome/free-brands-svg-icons'
+import { createPinia } from 'pinia'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBcxoVyEHrPCEfebnsOOcsUhybG2cp0zwc',
@@ -134,6 +135,7 @@ library.add(
 loadFonts()
 
 const app = createApp(App)
+const pinia = createPinia()
 const firebaseApp = initializeApp(firebaseConfig)
 const analytics = getAnalytics(firebaseApp)
 const firestore = getFirestore(firebaseApp)
@@ -142,6 +144,7 @@ const auth = getAuth(firebaseApp)
 
 app.use(router)
 app.use(vuetify)
+app.use(pinia)
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.component('QuillEditor', QuillEditor)
 app.mount('#app')

@@ -32,21 +32,7 @@
               display: 'flex',
               flexDirection: 'row',
       }">
-          <div
-              v-if="isLoading"
-              :style="{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100vw'
-              }"
-          >
-              <v-progress-circular
-                  indeterminate
-                  color="primary"
-              />
-          </div>
+          <CommonProgress v-if="isLoading" />
 
           <div
               v-else-if="!isLoading && filteredList.length === 0"
@@ -118,7 +104,7 @@
                         <font-awesome-icon icon="fa-solid fa-arrow-up-right-from-square"></font-awesome-icon>
                       </v-btn>
 
-                      <v-btn v-if="isSignedIn" @click="router.push({
+                      <v-btn v-if="isSignedIn && isAdmin" @click="router.push({
                           name: 'modifyPost',
                           state: {
                             post: {
@@ -133,7 +119,7 @@
                         <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
                       </v-btn>
 
-                      <v-btn v-if="isSignedIn" color="red" @click="deleteItem(item)">
+                      <v-btn v-if="isSignedIn && isAdmin" color="red" @click="deleteItem(item)">
                         <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
                       </v-btn>
                     </v-card-actions>
@@ -145,87 +131,42 @@
     </div>
 
     <v-dialog v-if="showWindow && selectedItem !== null" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
-      <v-card class="pa-5">
-        <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; z-index: 1000;">
-          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <div class="rounded-xl pa-2" style="max-width: 70%; word-break: break-word; white-space: pre-wrap; backdrop-filter: blur(5px);">
-              {{ selectedItem.title }}
-            </div>
-            <v-btn style="margin-left: 16px; flex-shrink: 0;" color="red" variant="tonal" @click="selectedItem = null; showWindow = false;">
-              <font-awesome-icon icon="fa-solid fa-xmark"/>
-            </v-btn>
-          </div>
-        </v-card-title>
-
-        <v-card-subtitle>
-          {{ selectedItem.date }}
-        </v-card-subtitle>
-
-        <v-card-text>
-          <div v-if="selectedItem.image !== '' && selectedItem.image !== undefined && selectedItem.image !== null">
-            <v-img
-              :src="selectedItem.image"
-              height="40vh"
-            />
-          </div>
-
-          <QuillEditor
-            class="mt-2"
-            v-model:content="selectedItem.contentsDelta"
-            :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn v-if="isSignedIn" @click="{
-            showWindow = false;
-            router.push({
-              name: 'modifyPost',
-              state: {
-                post: {
-                  id: selectedItem.id,
-                  contents: selectedItem.contents,
-                  title: selectedItem.title,
-                  date: selectedItem.date,
-                  category: getRouteName()
-                }
-              }
-            });
-          }">
-            <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
-          </v-btn>
-
-          <v-btn v-if="isSignedIn" color="red" @click="deleteItem(selectedItem)">
-            <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <BoardItemModal
+        :selected-item="selectedItem"
+        :is-signed-in="isSignedIn"
+        :is-admin="isAdmin"
+        @on:close="showWindow = false"
+        @on:update="onModifyItem"
+        @on:delete="deleteItem" />
     </v-dialog>
   </v-container>
 </div>
 </template>
 
 <script lang="ts" setup>
-import HeaderComponent from '@/components/HeaderComponent.vue'
-import { firestore as db, auth, storage } from '@/main'
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
+import { firestore as db, storage } from '@/main'
 import { CommonBoardItem } from '@/types/CommonBoardItem'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
-import { onAuthStateChanged } from 'firebase/auth'
 import { collection, getDocs, query, orderBy, Query, deleteDoc, doc } from 'firebase/firestore'
 import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { onMounted, ref, watch } from 'vue'
 import { RouteLocationNormalizedLoadedGeneric, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/AuthStateStore'
+import { storeToRefs } from 'pinia'
+import BoardItemModal from '@/components/board/BoardItemModal.vue'
+import CommonProgress from '@/components/common/CommonProgress.vue'
 
 const router = useRouter()
 const itemsList = ref<CommonBoardItem[]>([])
 const filteredList = ref<CommonBoardItem[]>([])
 const isLoading = ref(true)
 const searchText = ref('')
-const isSignedIn = ref(false)
+const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
 const selectedItem = ref<CommonBoardItem | null>(null)
 const showWindow = ref(false)
+
 let itemsQuery: Query | undefined
 
 function isExpandedAll () {
@@ -281,7 +222,8 @@ function getItems () {
           ...(doc.data() as CommonBoardItem),
           id: doc.id,
           contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
-          showContents: false
+          showContents: false,
+          category: getRouteName()
         }))
 
         filteredList.value = itemsList.value
@@ -293,6 +235,22 @@ function getItems () {
         isLoading.value = false
       })
   }
+}
+
+function onModifyItem (item: CommonBoardItem) {
+  showWindow.value = false
+  router.push({
+    name: 'modifyPost',
+    state: {
+      post: {
+        id: item.id,
+        contents: item.contents,
+        title: item.title,
+        date: item.date,
+        category: getRouteName()
+      }
+    }
+  })
 }
 
 function deleteItem (item: CommonBoardItem) {
@@ -328,10 +286,6 @@ function deleteItem (item: CommonBoardItem) {
 
 onMounted(() => {
   getItems()
-})
-
-onAuthStateChanged(auth, () => {
-  isSignedIn.value = auth.currentUser !== null
 })
 
 watch(router.currentRoute, () => {

@@ -61,10 +61,7 @@
             display: 'flex',
             justifyContent: 'center'
           }">
-            <v-progress-circular
-              v-if="isLoading"
-              indeterminate
-              color="primary"/>
+            <CommonProgress v-if="isLoading" />
 
             <div v-else-if="!isLoading && filteredPublications.length === 0" class="mt-5">
               <font-awesome-icon icon="fa-solid fa-xmark"/>
@@ -99,7 +96,7 @@
                         <font-awesome-icon icon="fa-solid fa-link"/>
                       </v-btn>
 
-                      <div v-if="isSignedIn">
+                      <div v-if="isSignedIn && isAdmin">
                         <v-btn variant="tonal" class="ml-2" @click="
                           {
                             isEditMode = true;
@@ -209,13 +206,18 @@
 </template>
 
 <script lang="ts" setup>
-import HeaderComponent from '@/components/HeaderComponent.vue'
 import { ref, onMounted, watch } from 'vue'
-import { firestore as db, auth } from '@/main'
+import { firestore as db } from '@/main'
 import { collection, deleteDoc, getDocs, orderBy, query, doc, updateDoc, addDoc } from 'firebase/firestore'
 import { Publication, PublicationRequest } from '@/types/Publication'
-import { onAuthStateChanged } from 'firebase/auth'
+import { useAuthStore } from '@/stores/AuthStateStore'
+import { storeToRefs } from 'pinia'
+
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import router from '@/router'
+import CommonProgress from '@/components/common/CommonProgress.vue'
+
+const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
 
 const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'))
 const publicationsList = ref<Publication[]>([])
@@ -226,7 +228,6 @@ const publicationTypes = ref([
 const selectedType = ref('Intl_Journals')
 const isLoading = ref(true)
 const isUploading = ref(false)
-const isSignedIn = ref(false)
 const isEditMode = ref(false)
 const showAddModal = ref(false)
 const searchText = ref('')
@@ -333,10 +334,6 @@ onMounted(() => {
         searchText.value = router.currentRoute.value.query.author as string
       }
     })
-})
-
-onAuthStateChanged(auth, () => {
-  isSignedIn.value = auth.currentUser !== null
 })
 
 watch(showAddModal, () => {

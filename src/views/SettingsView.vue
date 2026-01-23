@@ -169,7 +169,7 @@
                     </div>
                 </v-expansion-panel-text>
 
-                <v-dialog v-if="showUserTypeDescriptionWindow" v-model="showUserTypeDescriptionWindow" :style="{ backdropFilter: 'blur(5px)' }">
+                <v-dialog v-model="showUserTypeDescriptionWindow" :style="{ backdropFilter: 'blur(5px)' }">
                   <v-card class="pa-5">
                     <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; z-index: 1000;">
                       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
@@ -342,7 +342,7 @@
 </template>
 
 <script lang="ts" setup>
-import HeaderComponent from '@/components/HeaderComponent.vue'
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { deleteObject, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { updatePassword, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, validatePassword } from 'firebase/auth'

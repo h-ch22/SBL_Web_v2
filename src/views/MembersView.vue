@@ -61,10 +61,7 @@
             display: 'flex',
             justifyContent: 'center'
           }">
-            <v-progress-circular
-              v-if="isLoading"
-              indeterminate
-              color="primary"/>
+            <CommonProgress v-if="isLoading" />
 
             <div v-else-if="!isLoading && filteredMembers.length === 0" class="mt-5">
               <font-awesome-icon icon="fa-solid fa-xmark"/>
@@ -156,7 +153,7 @@
                             <font-awesome-icon icon="fa-solid fa-magnifying-glass"/>
                           </v-btn>
 
-                          <v-btn v-if="isSignedIn" @click="router.push({
+                          <v-btn v-if="isSignedIn && isAdmin" @click="router.push({
                             name: 'modifyMember',
                             state: {
                               member: {
@@ -177,7 +174,7 @@
                             <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
                           </v-btn>
 
-                          <v-btn v-if="isSignedIn" color="red" @click="deleteMember(member)">
+                          <v-btn v-if="isSignedIn && isAdmin" color="red" @click="deleteMember(member)">
                             <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
                           </v-btn>
                         </div>
@@ -265,7 +262,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn v-if="isSignedIn" @click="{
+          <v-btn v-if="isSignedIn && isAdmin" @click="{
             showWindow = false;
             router.push({
                 name: 'modifyMember',
@@ -289,7 +286,7 @@
             <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
           </v-btn>
 
-          <v-btn v-if="isSignedIn" color="red" @click="deleteMember(selectedMember)">
+          <v-btn v-if="isSignedIn && isAdmin" color="red" @click="deleteMember(selectedMember)">
             <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
           </v-btn>
         </v-card-actions>
@@ -300,17 +297,20 @@
 </template>
 
 <script lang="ts" setup>
-import { auth, firestore as db, storage } from '@/main'
+import { firestore as db, storage } from '@/main'
 import { onMounted, ref, watch } from 'vue'
-import HeaderComponent from '@/components/HeaderComponent.vue'
 import { Member } from '@/types/Member'
 import { query, collection, getDocs, doc, deleteDoc, orderBy } from 'firebase/firestore'
 import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { useTheme } from 'vuetify/lib/composables/theme'
 import { useRouter } from 'vue-router'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
+import { useAuthStore } from '@/stores/AuthStateStore'
+import { storeToRefs } from 'pinia'
+
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
-import { onAuthStateChanged } from 'firebase/auth'
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
+import CommonProgress from '@/components/common/CommonProgress.vue'
 
 const options = ref([
   'Professor', 'Researcher', 'Student', 'Alumni'
@@ -321,13 +321,13 @@ const members = ref<Member[]>([])
 const filteredMembers = ref<Member[]>([])
 const membersQuery = query(collection(db, 'Members'), orderBy('name'))
 const isLoading = ref(true)
-const isSignedIn = ref(false)
 const theme = useTheme()
 const router = useRouter()
 const searchText = ref('')
 const alwaysExpandAll = ref(false)
 const selectedMember = ref<Member | null>(null)
 const showWindow = ref(false)
+const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
 
 function isExpandedAll () {
   return filteredMembers.value.every(member => member.showCareer)
@@ -400,10 +400,6 @@ onMounted(() => {
     .finally(() => {
       isLoading.value = false
     })
-})
-
-onAuthStateChanged(auth, () => {
-  isSignedIn.value = auth.currentUser !== null
 })
 
 watch(selectedOption, () => {

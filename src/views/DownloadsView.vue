@@ -32,25 +32,11 @@
           display: 'flex',
           flexDirection: 'row',
       }">
-        <div
-            v-if="isLoading"
-            :style="{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100vw'
-            }"
-        >
-            <v-progress-circular
-                indeterminate
-                color="primary"
-            />
-        </div>
+        <CommonProgress v-if="isLoading" />
 
         <div v-else-if="!isLoading && filteredList.length === 0" class="mt-5">
           <font-awesome-icon icon="fa-solid fa-xmark"/>
-          {{ auth.currentUser !== null ? 'No posts found' : 'No posts found. Some posts are only visible when you are signed in.' }}
+          {{ isSignedIn ? 'No posts found' : 'No posts found. Some posts are only visible when you are signed in.' }}
         </div>
 
         <v-row v-else>
@@ -112,7 +98,7 @@
                       <font-awesome-icon icon="fa-solid fa-window-maximize"></font-awesome-icon>
                     </v-btn>
 
-                    <v-btn v-if="isSignedIn" @click="router.push({
+                    <v-btn v-if="isSignedIn && isAdmin" @click="router.push({
                         name: 'modifyPost',
                         state: {
                           post: {
@@ -127,7 +113,7 @@
                       <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
                     </v-btn>
 
-                    <v-btn v-if="isSignedIn" color="red" @click="deleteItem(item)">
+                    <v-btn v-if="isSignedIn && isAdmin" color="red" @click="deleteItem(item)">
                       <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
                     </v-btn>
                   </v-card-actions>
@@ -175,7 +161,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
 
-            <v-btn v-if="isSignedIn" @click="{
+            <v-btn v-if="isSignedIn && isAdmin" @click="{
               showWindow = false;
               router.push({
                 name: 'modifyPost',
@@ -193,7 +179,7 @@
               <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
             </v-btn>
 
-            <v-btn v-if="isSignedIn" color="red" @click="deleteItem(selectedItem)">
+            <v-btn v-if="isSignedIn && isAdmin" color="red" @click="deleteItem(selectedItem)">
               <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
             </v-btn>
           </v-card-actions>
@@ -204,24 +190,27 @@
 </template>
 
 <script lang="ts" setup>
-import HeaderComponent from '@/components/HeaderComponent.vue'
-import { firestore as db, auth, storage } from '@/main'
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
+import { firestore as db, storage } from '@/main'
 import { Download } from '@/types/Download'
 import { useRouter } from 'vue-router'
 import { deleteDoc, doc, getDocs, query, orderBy, collection } from 'firebase/firestore'
 import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { onMounted, ref, watch } from 'vue'
-import { onAuthStateChanged } from 'firebase/auth'
 import { Delta } from '@vueup/vue-quill'
+import { useAuthStore } from '@/stores/AuthStateStore'
+import { storeToRefs } from 'pinia'
+
+import CommonProgress from '@/components/common/CommonProgress.vue'
 
 const router = useRouter()
 const isLoading = ref(true)
 const searchText = ref('')
 const downloadsList = ref<Download[]>([])
 const filteredList = ref<Download[]>([])
-const isSignedIn = ref(false)
 const selectedItem = ref<Download | null>(null)
 const showWindow = ref(false)
+const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
 
 function isExpandedAll () {
   return filteredList.value.every(item => item.showContents)
@@ -283,19 +272,12 @@ onMounted(() => {
       console.log(e.message)
     })
     .finally(() => {
-      if (!isSignedIn.value) {
-        isLoading.value = false
-      }
+      isLoading.value = false
     })
 })
 
-onAuthStateChanged(auth, () => {
-  isSignedIn.value = auth.currentUser !== null
-
-  if (auth.currentUser === null) {
-    downloadsList.value = downloadsList.value.filter(item => !item.isPrivate)
-    filteredList.value = filteredList.value.filter(item => !item.isPrivate)
-  } else {
+watch(() => isSignedIn.value, () => {
+  if (isSignedIn.value) {
     getDocs(query(collection(db, 'Private_Downloads'), orderBy('date', 'desc')))
       .then((querySnapshot) => {
         downloadsList.value.push(...querySnapshot.docs.map((doc) => ({
@@ -315,6 +297,9 @@ onAuthStateChanged(auth, () => {
       .finally(() => {
         isLoading.value = false
       })
+  } else {
+    downloadsList.value = downloadsList.value.filter(item => !item.isPrivate)
+    filteredList.value = filteredList.value.filter(item => !item.isPrivate)
   }
 })
 

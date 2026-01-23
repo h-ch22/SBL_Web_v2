@@ -48,21 +48,7 @@
             display: 'flex',
             flexDirection: 'row',
         }">
-          <div
-              v-if="isLoading"
-              :style="{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100vw'
-              }"
-          >
-              <v-progress-circular
-                  indeterminate
-                  color="primary"
-              />
-          </div>
+          <CommonProgress v-if="isLoading" />
 
           <div v-else-if="selectedOption === 'Projects'" class="mt-5">
             <div v-if="projectList.length === 0" :style="{
@@ -99,7 +85,7 @@
                   </v-row>
                 </v-card-text>
 
-                <v-card-actions v-if="isSignedIn">
+                <v-card-actions v-if="isSignedIn && isAdmin">
                   <v-btn
                     variant="text"
                     color="primary"
@@ -345,15 +331,20 @@
 <script lang="ts" setup>
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
-import HeaderComponent from '@/components/HeaderComponent.vue'
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import ImageUploader from 'quill-image-uploader'
-import { firestore as db, auth, storage } from '@/main'
+
+import { useAuthStore } from '@/stores/AuthStateStore'
+import { storeToRefs } from 'pinia'
+import { firestore as db, storage } from '@/main'
 import { Project, ProjectRequest } from '@/types/Research'
 import { updateDoc, addDoc, doc, getDocs, query, collection, orderBy, deleteDoc, getDoc } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { onMounted, ref, watch } from 'vue'
-import { onAuthStateChanged } from 'firebase/auth'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
+import CommonProgress from '@/components/common/CommonProgress.vue'
+
+const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
 
 const isLoading = ref(true)
 const isUploading = ref(false)
@@ -362,7 +353,6 @@ const selectedId = ref('')
 const selectedDate = ref(new Date())
 const showAddModal = ref(false)
 const showResearchModal = ref(false)
-const isSignedIn = ref(false)
 const selectedOption = ref('Research')
 const options = ref(['Research', 'Projects'])
 const projectList = ref<Project[]>([])
@@ -585,10 +575,6 @@ watch(showAddModal, (newVal) => {
 
 onMounted(() => {
   getResearch()
-})
-
-onAuthStateChanged(auth, () => {
-  isSignedIn.value = auth.currentUser !== null
 })
 
 </script>

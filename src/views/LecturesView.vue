@@ -2,7 +2,7 @@
   <div style="top: 72px; margin-bottom: 72px; position: relative;">
     <v-container>
       <div :style="{
-          minHeight: '100vh'
+          minHeight: '100vh',
       }">
         <div>
           <HeaderComponent
@@ -29,13 +29,10 @@
             display: 'flex',
             justifyContent: 'center',
           }">
-            <v-progress-circular
-              v-if="isLoading"
-              indeterminate
-              color="primary"/>
+            <CommonProgress v-if="isLoading" />
 
-            <div v-else>
-              <v-row
+            <div v-else style="max-width: 100vw;">
+              <div
                   class="mt-2"
                   :style="{
                     display: 'flex',
@@ -65,9 +62,9 @@
                         {{ year }}
                       </v-chip>
                   </div>
-              </v-row>
+                </div>
 
-              <v-row
+              <div
                   class="mt-4 mb-2"
                   :style="{
                     display: 'flex',
@@ -97,7 +94,7 @@
                         {{ semester }}
                       </v-chip>
                   </div>
-              </v-row>
+              </div>
 
               <div v-if="filteredLectures.length === 0" class="mt-5">
                 <font-awesome-icon icon="fa-solid fa-xmark"/>
@@ -123,7 +120,7 @@
               </div>
 
               <div :style="{ display: 'flex', flexDirection: 'row', flexShrink: 0 }">
-                <div v-if="isSignedIn">
+                <div v-if="isSignedIn && isAdmin">
                   <v-btn variant="tonal" class="ml-2" @click="
                     {
                       isEditMode = true
@@ -235,12 +232,14 @@
 </template>
 
 <script lang="ts" setup>
-import HeaderComponent from '@/components/HeaderComponent.vue'
+import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import { ref, onMounted, watch } from 'vue'
-import { firestore as db, auth } from '@/main'
+import { firestore as db } from '@/main'
 import { collection, getDocs, orderBy, query, deleteDoc, doc, updateDoc, addDoc } from 'firebase/firestore'
 import { Lecture, LectureRequest } from '@/types/Lecture'
-import { onAuthStateChanged } from 'firebase/auth'
+import { useAuthStore } from '@/stores/AuthStateStore'
+import { storeToRefs } from 'pinia'
+import CommonProgress from '@/components/common/CommonProgress.vue'
 
 const lecturesQuery = query(collection(db, 'Coarses'), orderBy('year', 'desc'))
 const lecturesList = ref<Lecture[]>([])
@@ -251,10 +250,10 @@ const selectedYear = ref('')
 
 const semestersList = ref<string[]>(['Spring', 'Summer', 'Fall', 'Winter'])
 const selectedSemester = ref(getCurrentSemester())
+const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
 
 const isLoading = ref(false)
 const isUploading = ref(false)
-const isSignedIn = ref(false)
 const isEditMode = ref(false)
 const showAddModal = ref(false)
 
@@ -423,10 +422,6 @@ watch(searchText, () => {
     const searchLower = searchText.value.toLowerCase()
     filteredLectures.value = lecturesList.value.filter(lect => lect.title.toLowerCase().includes(searchLower))
   }
-})
-
-onAuthStateChanged(auth, () => {
-  isSignedIn.value = auth.currentUser !== null
 })
 
 onMounted(() => {

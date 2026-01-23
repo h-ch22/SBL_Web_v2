@@ -38,7 +38,7 @@
       </v-btn>
 
       <v-btn
-          v-if="isSignedIn && props.showTrailingBtn && !props.showProgress"
+          v-if="isSignedIn && isAdmin && props.showTrailingBtn && !props.showProgress"
           variant="tonal"
           @click="emit('on-click')"
       >
@@ -56,9 +56,8 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, ref } from 'vue'
-import { auth } from '@/main'
-import { onAuthStateChanged } from 'firebase/auth'
+import { useAuthStore } from '@/stores/AuthStateStore'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps({
   title: String,
@@ -92,11 +91,7 @@ const props = defineProps({
   }
 })
 
-const isSignedIn = ref(false)
-
 const emit = defineEmits(['on-click', 'on-leading-btn-click', 'on-secondary-btn-click'])
+const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
 
-onAuthStateChanged(auth, () => {
-  isSignedIn.value = auth.currentUser !== null
-})
 </script>

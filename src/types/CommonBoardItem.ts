@@ -8,6 +8,7 @@ export type CommonBoardItem = {
     image: string
     title: string
     showContents: boolean
+    category: 'Awards' | 'Gallery' | 'News'
 }
 
 export type CommonBoardCreateRequest = {

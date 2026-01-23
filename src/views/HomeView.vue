@@ -12,7 +12,7 @@
         playsinline="true"
         controlslist="nodownload nofullscreen noremoteplayback"
         webkit-playsinline
-        ></video>
+      ></video>
 
       <v-img v-else-if="bannerURL !== '' && bannerType === 'Image'" :src="bannerURL" id="banner-video" />
 
@@ -45,26 +45,10 @@
         }"
       >SBL TODAY</div>
 
-      <div class="news-scroll-row">
-        <div v-for="news in newsList" :key="news.id">
-          <v-card class="ml-3 mt-2 pa-2 rounded-xl" variant="outlined" :style="{ width: '250px' }">
-            <v-card-title>
-              <v-img
-                :src="news.image"
-                width="200px"
-                height="300px"/>
-
-              <div class="news-title" @click="
-                selectedNews = news,
-                showWindow = true
-              ">
-                {{ news.title }}
-              </div>
-            </v-card-title>
-            <v-card-subtitle> {{ news.date }} </v-card-subtitle>
-          </v-card>
-        </div>
-      </div>
+      <HomeBoardListItem
+        :itemList="newsList"
+        @on:itemClick="onItemClick"
+      ></HomeBoardListItem>
 
       <div class="center-aligned-div mt-2">
         <v-btn variant="tonal" @click="router.push('/news')">Show All</v-btn>
@@ -79,8 +63,14 @@
       </div>
 
       <div v-for="pub in publicationList" :key="pub.id">
-        <div class="mb-2" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
-          <div class="ml-2">
+        <div class="mb-2" :style="{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          textAlign: 'left',
+        }">
+          <div class="ml-2 pub-title">
             {{ pub.contents }}
           </div>
 
@@ -99,47 +89,39 @@
         :style="{
           color: theme.current.value.colors.primary
         }"
+      >SBL MOMENT</div>
+
+      <HomeBoardListItem
+        :itemList="galleryList"
+        @on:itemClick="onItemClick"
+      ></HomeBoardListItem>
+
+      <div class="center-aligned-div mt-2">
+        <v-btn variant="tonal" @click="router.push('/gallery')">Show All</v-btn>
+      </div>
+
+      <div
+        class="text-h5 font-weight-bold center-aligned-div mt-6 mb-2"
+        :style="{
+          color: theme.current.value.colors.primary
+        }"
       >CONTACT
       </div>
 
-      <div v-if="phone !== ''" class="mb-2" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
-        <div :style="{ display: 'flex', flexDirection: 'row', alignContent: 'flex-start', alignItems: 'center' }">
-          <font-awesome-icon icon="fa-solid fa-phone"/>
-          <div class="ml-2">
-            {{ phone }}
-          </div>
-        </div>
+      <HomeContactItem v-if="phone !== ''"
+        :icon="'fa-solid fa-phone'"
+        :label="phone"
+        @on:click="call" />
 
-        <v-btn variant="text" @click="call">
-          <font-awesome-icon icon="fa-solid fa-phone" class="mr-1"/>
-        </v-btn>
-      </div>
+      <HomeContactItem v-if="email !== ''"
+        :icon="'fa-solid fa-envelope'"
+        :label="email"
+        @on:click="mailTo" />
 
-      <div v-if="email !== ''" class="mb-2" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
-        <div :style="{ display: 'flex', flexDirection: 'row', alignContent: 'flex-start', alignItems: 'center' }">
-          <font-awesome-icon icon="fa-solid fa-envelope"/>
-          <div class="ml-2">
-            {{ email }}
-          </div>
-        </div>
-
-        <v-btn variant="text" @click="mailTo">
-          <font-awesome-icon icon="fa-solid fa-envelope" class="mr-1"/>
-        </v-btn>
-      </div>
-
-      <div v-if="address !== ''" class="mb-2" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
-        <div :style="{ display: 'flex', flexDirection: 'row', alignContent: 'flex-start', alignItems: 'center' }">
-          <font-awesome-icon icon="fa-solid fa-location-pin"/>
-          <div class="ml-2">
-            {{ address }}
-          </div>
-        </div>
-
-        <v-btn variant="text" @click="openMap">
-          <font-awesome-icon icon="fa-solid fa-location-pin" class="mr-1"/>
-        </v-btn>
-      </div>
+      <HomeContactItem v-if="address !== ''"
+        :icon="'fa-solid fa-location-pin'"
+        :label="address"
+        @on:click="openMap" />
 
       <div class="center-aligned-div mt-2" @click="router.push('/contact')">
         <v-btn variant="tonal">Details</v-btn>
@@ -148,63 +130,12 @@
     </v-container>
   </div>
 
-  <v-dialog v-if="showWindow && selectedNews !== undefined" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
-    <v-card class="pa-5">
-      <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; z-index: 1000;">
-        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-          <div class="rounded-xl pa-2" style="max-width: 70%; word-break: break-word; white-space: pre-wrap; backdrop-filter: blur(5px);">
-            {{ selectedNews.title }}
-          </div>
-          <v-btn style="margin-left: 16px; flex-shrink: 0;" color="red" variant="tonal" @click="selectedNews = undefined; showWindow = false;">
-            <font-awesome-icon icon="fa-solid fa-xmark"/>
-          </v-btn>
-        </div>
-      </v-card-title>
-
-      <v-card-subtitle>
-        {{ selectedNews.date }}
-      </v-card-subtitle>
-
-      <v-card-text>
-        <div v-if="selectedNews.image !== '' && selectedNews.image !== undefined && selectedNews.image !== null">
-          <v-img
-            :src="selectedNews.image"
-            height="40vh"
-          />
-        </div>
-
-        <QuillEditor
-          class="mt-2"
-          v-model:content=" selectedNews.contentsDelta"
-          :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
-      </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn v-if="isSignedIn" @click="{
-          showWindow = false;
-          router.push({
-            name: 'modifyPost',
-            state: {
-              post: {
-                id: selectedNews.id,
-                contents: selectedNews.contents,
-                title: selectedNews.title,
-                date: selectedNews.date,
-                category: 'News'
-              }
-            }
-          });
-        }">
-          <font-awesome-icon icon="fa-solid fa-edit"></font-awesome-icon>
-        </v-btn>
-
-        <v-btn v-if="isSignedIn" color="red" @click="deleteItem(selectedNews)">
-          <font-awesome-icon icon="fa-solid fa-trash"></font-awesome-icon>
-        </v-btn>
-      </v-card-actions>
-    </v-card>
+  <v-dialog v-if="showWindow && selectedItem !== undefined" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
+    <BoardItemModal
+      :selected-item="selectedItem"
+      @on:close="onCloseWindow"
+      @on:update="modifyItem"
+      @on:delete="deleteItem" />
   </v-dialog>
 
 </template>
@@ -247,17 +178,12 @@
   font-size: 30px;
 }
 
-.news-scroll-row {
-  display: flex;
-  flex-direction: row;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding-bottom: 8px;
-}
-
-.news-title:hover{
-  text-decoration: underline;
-  cursor: pointer;
+.pub-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 
 .center-aligned-div {
@@ -274,12 +200,15 @@ import { ref, onMounted, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { firestore as db, storage, auth } from '@/main'
 import { Publication } from '@/types/Publication'
-import { Delta, QuillEditor } from '@vueup/vue-quill'
+import { Delta } from '@vueup/vue-quill'
 import { onAuthStateChanged } from 'firebase/auth'
 import { CommonBoardItem } from '@/types/CommonBoardItem'
 
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import router from '@/router'
+import HomeBoardListItem from '@/components/home/HomeBoardListItem.vue'
+import BoardItemModal from '@/components/board/BoardItemModal.vue'
+import HomeContactItem from '@/components/home/HomeContactItem.vue'
 
 const theme = useTheme()
 
@@ -288,13 +217,15 @@ const isSignedIn = ref(false)
 const showWindow = ref(false)
 const isLoading = ref(false)
 
-const selectedNews = ref<CommonBoardItem | undefined>(undefined)
+const selectedItem = ref<CommonBoardItem | undefined>(undefined)
 
 const newsQuery = query(collection(db, 'News'), orderBy('date', 'desc'), limit(5))
 const publicationsQuery = query(collection(db, 'Publications'), orderBy('year', 'desc'), limit(5))
+const galleryQuery = query(collection(db, 'Gallery'), orderBy('date', 'desc'), limit(5))
 const contactRef = doc(db, 'Contact', 'Introduction')
 
 const newsList = ref<CommonBoardItem[]>([])
+const galleryList = ref<CommonBoardItem[]>([])
 const publicationList = ref<Publication[]>([])
 const phone = ref('')
 const email = ref('')
@@ -328,7 +259,8 @@ onMounted(() => {
         ...(doc.data() as CommonBoardItem),
         id: doc.id,
         contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
-        showContents: false
+        showContents: false,
+        category: 'News'
       }))
     })
     .catch((e: Error) => {
@@ -346,6 +278,20 @@ onMounted(() => {
           year: doc.data().year
         })
       })
+    })
+    .catch((e: Error) => {
+      console.log(e.message)
+    })
+
+  getDocs(galleryQuery)
+    .then((docs) => {
+      galleryList.value = docs.docs.map((doc) => ({
+        ...(doc.data() as CommonBoardItem),
+        id: doc.id,
+        contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
+        showContents: false,
+        category: 'Gallery'
+      }))
     })
     .catch((e: Error) => {
       console.log(e.message)
@@ -383,6 +329,11 @@ function togglePlayPause () {
   videoElement.removeEventListener('pause', () => { isPlaying.value = false })
 }
 
+function onItemClick (item: CommonBoardItem) {
+  selectedItem.value = item
+  showWindow.value = true
+}
+
 function call () {
   document.location.href = `tel:${phone.value}`
 }
@@ -396,14 +347,35 @@ function openMap () {
   window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
 }
 
+function onCloseWindow () {
+  selectedItem.value = undefined
+  showWindow.value = false
+}
+
+function modifyItem (item: CommonBoardItem) {
+  showWindow.value = false
+  router.push({
+    name: 'modifyPost',
+    state: {
+      post: {
+        id: item.id,
+        contents: item.contents,
+        title: item.title,
+        date: item.date,
+        category: item.category
+      }
+    }
+  })
+}
+
 function deleteItem (item: CommonBoardItem) {
   if (confirm(`Are you sure you want to delete post ${item.title}?\nThis action cannot be undone.`)) {
     showWindow.value = false
     isLoading.value = true
-    deleteDoc(doc(db, 'News', item.id as string))
+    deleteDoc(doc(db, item.category, item.id as string))
       .then(() => {
         if (item.image !== '' && item.image !== undefined && item.image !== null) {
-          deleteObject(storageRef(storage, `news/img/${item.id}.${item.image.split('.').pop()?.split('?')[0]}`))
+          deleteObject(storageRef(storage, `${item.category.toLowerCase()}/img/${item.id}.${item.image.split('.').pop()?.split('?')[0]}`))
             .catch((e: Error) => {
               alert(`An error occurred while deleting image.\nPlease try again later.\n(${e.message})`)
             })
@@ -431,7 +403,7 @@ onAuthStateChanged(auth, () => {
 
 watch(showWindow, () => {
   if (!showWindow.value) {
-    selectedNews.value = undefined
+    selectedItem.value = undefined
   }
 })
 </script>
