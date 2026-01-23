@@ -1,9 +1,7 @@
 <template>
-  <div style="top: 72px; margin-bottom: 72px; position: relative;">
+  <div class="container">
     <v-container>
-      <div :style="{
-          minHeight: '100vh',
-      }">
+      <div class="global-container">
         <div>
           <HeaderComponent
             :title="'Lectures'"
@@ -12,43 +10,34 @@
         </div>
 
         <v-text-field
-            class="mt-5"
+            class="mt-5 search-bar"
             v-model="searchText"
             label="Search Lectures"
             color="primary"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
-            :style="{ maxWidth: '100vw' }"
             clear-icon="mdi-close"
             clearable
             @click:clear="searchText = ''"
         ></v-text-field>
 
-        <div
-          :style="{
-            display: 'flex',
-            justifyContent: 'center',
-          }">
+        <div class="header-container">
             <CommonProgress v-if="isLoading" />
 
-            <div v-else style="max-width: 100vw;">
-              <div
-                  class="mt-2"
-                  :style="{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    overflowX: 'auto',
-                }">
+            <div v-else class="chips-container">
+              <div class="mt-2 chips">
                   <div
                     class="ml-2 mt-2"
                     v-for="year in yearsList"
-                    :key="year">
+                    :key="year"
+                  >
                       <v-chip
                         v-if="selectedYear === year && searchText === ''"
                         prepend-icon="mdi-check"
                         variant="tonal"
                         color="primary"
-                        class="rounded-pill">
+                        class="rounded-pill"
+                      >
                         {{ year }}
                       </v-chip>
 
@@ -58,29 +47,27 @@
                         variant="tonal"
                         class="rounded-pill"
                         :disabled="searchText !== '' || filteredLectures.length === 0"
-                        >
+                      >
                         {{ year }}
                       </v-chip>
                   </div>
                 </div>
 
               <div
-                  class="mt-4 mb-2"
-                  :style="{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    overflowX: 'auto',
-                }">
+                  class="mt-4 mb-2 chips"
+                >
                   <div
                     class="ml-2 mt-2"
                     v-for="semester in semestersList"
-                    :key="semester">
+                    :key="semester"
+                  >
                       <v-chip
                         v-if="selectedSemester === semester && searchText === ''"
                         prepend-icon="mdi-check"
                         variant="tonal"
                         color="primary"
-                        class="rounded-pill">
+                        class="rounded-pill"
+                      >
                         {{ semester }}
                       </v-chip>
 
@@ -90,7 +77,7 @@
                         variant="tonal"
                         class="rounded-pill"
                         :disabled="lecturesList.filter(lect => lect.semester === semester && lect.year === selectedYear).length === 0 || searchText !== ''"
-                        >
+                      >
                         {{ semester }}
                       </v-chip>
                   </div>
@@ -105,21 +92,17 @@
 
         <div
           v-for="lect in filteredLectures"
-          class="mt-5"
+          class="mt-5 contents-container"
           :key="lect.id"
-          :style="{
-            display: 'flex',
-            flexDirection: 'column',
-            overflowY: 'auto',
-          }">
-            <div class="mb-3" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }">
+        >
+            <div class="mb-3 item-container">
               <div :style="{ flex: '1 1 0%' }">
                 <v-chip v-if="searchText !== ''" class="rounded-xl mr-2" color="primary" variant="tonal">{{ lect.year }} {{ lect.semester }}</v-chip>
                 <v-chip class="rounded-xl mr-2" color="primary" variant="outlined">{{ lect.graduate === '0' ? 'Undergraduate' : 'Graduate' }}</v-chip>
                 {{ lect.title }}
               </div>
 
-              <div :style="{ display: 'flex', flexDirection: 'row', flexShrink: 0 }">
+              <div class="actions-container">
                 <div v-if="isSignedIn && isAdmin">
                   <v-btn variant="tonal" class="ml-2" @click="
                     {
@@ -147,16 +130,16 @@
         </div>
       </div>
 
-      <div class="text-caption" style="display: flex; flex-direction: row; justify-content: center; align-items: center; bottom: 0">
+      <div class="text-caption">
         {{ 'If you want to check the syllabus and lecture information, please use the Jeonbuk National University course registration system site.' }}
         <v-btn class="ml-2" variant="text" :href="'https://oasis.jbnu.ac.kr/jbnu/sugang/sbjt/sbjt.html?param=KOR'">
           <font-awesome-icon icon="fa-solid fa-link"/>
         </v-btn>
       </div>
 
-      <v-dialog v-model="showAddModal" :style="{ backdropFilter: 'blur(5px)' }">
-        <v-card class="pa-4">
-            <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
+      <v-dialog v-model="showAddModal" class="dialog">
+        <v-card class="pa-4 card">
+            <v-card-title class="rounded-xl title-container">
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
                 {{ isEditMode ? 'Edit Lecture' : 'Add Lecture' }}
                 <v-spacer/>
@@ -166,7 +149,7 @@
               </v-row>
             </v-card-title>
 
-            <v-card-contents>
+            <v-card-contents class="card-contents">
               <v-text-field
                 class="mt-4"
                 v-model="newLectureModel.title"
@@ -176,8 +159,7 @@
                 prepend-icon="mdi-format-title"
                 clear-icon="mdi-close"
                 clearable
-                @click:clear="newLectureModel.title = ''"
-                :style="{ maxWidth: '100vw' }"/>
+                @click:clear="newLectureModel.title = ''"/>
 
               <v-text-field
                 class="mt-4"
@@ -186,8 +168,7 @@
                 variant="outlined"
                 color="primary"
                 prepend-icon="mdi-calendar"
-                type="number"
-                :style="{ maxWidth: '100vw' }"/>
+                type="number"/>
 
               <v-select
                 class="mt-4"
@@ -196,8 +177,7 @@
                 label="Semester"
                 variant="outlined"
                 color="primary"
-                prepend-icon="mdi-tree"
-                :style="{ maxWidth: '100vw' }"/>
+                prepend-icon="mdi-tree"/>
 
               <v-checkbox
                 class="mt-4"
@@ -206,8 +186,7 @@
                 :false-value="'0'"
                 label="Graduate Course"
                 color="primary"
-                prepend-icon="mdi-school"
-                :style="{ maxWidth: '100vw' }"/>
+                prepend-icon="mdi-school"/>
             </v-card-contents>
 
             <v-card-actions>
@@ -225,11 +204,40 @@
                 <font-awesome-icon icon="fa-solid fa-check"/>
               </v-btn>
             </v-card-actions>
-          </v-card>
+        </v-card>
       </v-dialog>
     </v-container>
   </div>
 </template>
+
+<style scoped lang="scss">
+  .contents-container {
+    flex-direction: column !important;
+    overflow-y: auto;
+
+    .item-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+
+      .actions-container {
+        display: flex;
+        flex-direction: row;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .text-caption {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    bottom: 0;
+  }
+</style>
 
 <script lang="ts" setup>
 import HeaderComponent from '@/components/home/HeaderComponent.vue'

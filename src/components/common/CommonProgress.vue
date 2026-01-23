@@ -7,7 +7,7 @@
     </div>
 </template>
 
-<style>
+<style scoped lang="scss">
 .progress-container {
     display: flex;
     justify-content: center;

@@ -13,7 +13,7 @@
 </div>
 </template>
 
-<style>
+<style scoped lang="scss">
 .contact-item {
   display: flex;
   flex-direction: row;

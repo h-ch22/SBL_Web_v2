@@ -1,9 +1,7 @@
 <template>
-<div style="top: 72px; margin-bottom: 72px; position: relative;">
+<div class="container">
   <v-container>
-    <div :style="{
-      minHeight: '100vh'
-    }">
+    <div class="global-container">
       <div>
         <HeaderComponent
           :title="'Settings'"

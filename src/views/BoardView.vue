@@ -1,9 +1,7 @@
 <template>
-<div style="top: 72px; margin-bottom: 72px; position: relative;">
+<div class="container">
   <v-container>
-    <div :style="{
-      minHeight: '100vh'
-    }">
+    <div class="global-container">
       <div>
         <HeaderComponent
           :title="getRouteName()"
@@ -15,36 +13,24 @@
       </div>
 
       <v-text-field
-        class="mt-5"
+        class="mt-5 search-bar"
         v-model="searchText"
         label="Search"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         color="primary"
-        :style="{ maxWidth: '100vw' }"
         clear-icon="mdi-close"
         clearable
         @click:clear="searchText = ''"
       ></v-text-field>
 
-      <div
-          :style="{
-              display: 'flex',
-              flexDirection: 'row',
-      }">
+      <div class="contents-container">
           <CommonProgress v-if="isLoading" />
 
           <div
               v-else-if="!isLoading && filteredList.length === 0"
-              class="mt-5"
-              :style="{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100vw'
-              }
-          ">
+              class="mt-5 no-items-container"
+          >
             <font-awesome-icon icon="fa-solid fa-xmark"/>
             {{ 'No items found' }}
           </div>
@@ -54,8 +40,7 @@
                 <div>
                   <v-card class="rounded-xl" variant="outlined">
                     <v-card-title
-                      class="text-h4 font-weight-medium mt-2 rounded-xl"
-                      style="word-break: break-word; white-space: normal;"
+                      class="text-h4 font-weight-medium mt-2 rounded-xl item-title-container"
                     >
                       <v-img
                         v-if="item.image !== '' && item.image !== undefined && item.image !== null"
@@ -63,7 +48,7 @@
                         height="40vh"
                       />
 
-                    <div :style="{ alignContent: 'center' }" class="text-h5 mt-2">
+                    <div class="text-h5 mt-2 title-container">
                         {{ item.title }}
                       </div>
                     </v-card-title>
@@ -144,11 +129,12 @@
 </template>
 
 <script lang="ts" setup>
+import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import '@/styles/global.scss'
 import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import { firestore as db, storage } from '@/main'
 import { CommonBoardItem } from '@/types/CommonBoardItem'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import { collection, getDocs, query, orderBy, Query, deleteDoc, doc } from 'firebase/firestore'
 import { ref as storageRef, deleteObject } from 'firebase/storage'
 import { onMounted, ref, watch } from 'vue'

@@ -18,7 +18,7 @@
 </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .board-item-scroll-row {
   display: flex;
   flex-direction: row;

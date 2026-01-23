@@ -140,7 +140,7 @@
 
 </template>
 
-<style>
+<style scoped lang="scss">
 #banner-video::-webkit-media-controls {
   display: none !important;
   opacity: 0;

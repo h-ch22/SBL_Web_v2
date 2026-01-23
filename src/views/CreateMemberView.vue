@@ -1,7 +1,7 @@
 <template>
-  <div style="top: 72px; margin-bottom: 72px; position: relative;">
+  <div class="container">
     <v-container>
-      <div :style="{ minHeight: '100vh' }">
+      <div class="global-container">
         <div>
           <HeaderComponent
             :title="isEditMode ? 'Modify Member' : 'Create New Member'"
@@ -14,7 +14,7 @@
           ></HeaderComponent>
         </div>
 
-        <div style="display: flex; justify-content: center; align-items: center; flex-direction: row;">
+        <div class="header-container">
           <v-img
             class="mb-4"
             :src="memberData.cat === MemberCategoryType.ALUMNI ? require(
@@ -161,8 +161,19 @@
   </div>
 </template>
 
+<style scoped lang="scss">
+  .header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+  }
+</style>
+
 <script lang="ts" setup>
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import '@/styles/global.scss'
+
 import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import { useTheme } from 'vuetify/lib/composables/theme'
 import { firestore as db, storage } from '@/main'

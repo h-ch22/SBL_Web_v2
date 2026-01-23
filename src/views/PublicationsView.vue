@@ -1,9 +1,7 @@
 <template>
-  <div style="top: 72px; margin-bottom: 72px; position: relative;">
+  <div class="container">
     <v-container>
-      <div :style="{
-          minHeight: '100vh'
-      }">
+      <div class="global-container">
         <div>
           <HeaderComponent
             :title="'Publications'"
@@ -12,13 +10,12 @@
         </div>
 
         <v-text-field
-          class="mt-5"
+          class="mt-5 search-bar"
           v-model="searchText"
           label="Search Publications"
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
           color="primary"
-          :style="{ maxWidth: '100vw' }"
           clear-icon="mdi-close"
           clearable
           @click:clear="searchText = ''"
@@ -216,6 +213,7 @@ import { storeToRefs } from 'pinia'
 import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import router from '@/router'
 import CommonProgress from '@/components/common/CommonProgress.vue'
+import '@/styles/global.scss'
 
 const { isSignedIn, isAdmin } = storeToRefs(useAuthStore())
 

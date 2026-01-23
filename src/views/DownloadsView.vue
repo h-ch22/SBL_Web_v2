@@ -1,9 +1,7 @@
 <template>
-<div style="top: 72px; margin-bottom: 72px; position: relative;">
+<div class="container">
   <v-container>
-    <div :style="{
-      minHeight: '100vh'
-    }">
+    <div class="global-container">
       <div>
         <HeaderComponent
           :title="'Downloads'"
@@ -15,23 +13,18 @@
       </div>
 
       <v-text-field
-        class="mt-5"
+        class="mt-5 search-bar"
         v-model="searchText"
         label="Search Downloads"
         color="primary"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
-        :style="{ maxWidth: '100vw' }"
         clear-icon="mdi-close"
         clearable
         @click:clear="searchText = ''"
       ></v-text-field>
 
-      <div
-        :style="{
-          display: 'flex',
-          flexDirection: 'row',
-      }">
+      <div class="contents-container">
         <CommonProgress v-if="isLoading" />
 
         <div v-else-if="!isLoading && filteredList.length === 0" class="mt-5">
@@ -54,7 +47,7 @@
 
                   <v-card-subtitle>
                     {{ item.date }}
-                    <div v-if="item.isPrivate && !item.showContents" class="mt-2 text-caption" style="color: gray;">
+                    <div v-if="item.isPrivate && !item.showContents" class="mt-2 text-caption gray-text">
                       <font-awesome-icon icon="fa-solid fa-eye-slash"/>
                       Private
                     </div>
@@ -68,12 +61,12 @@
                       v-model:content="item.contentsDelta"
                       :options="{ readOnly: true, theme: 'bubble', modules: { toolbar: false } }"/>
 
-                    <div v-if="item.isPrivate" class="mt-2 text-caption" style="color: gray;">
+                    <div v-if="item.isPrivate" class="mt-2 text-caption gray-text">
                       <font-awesome-icon icon="fa-solid fa-eye-slash"/>
                       This is a private post, only visible to signed-in users.
                     </div>
 
-                    <v-btn class="mt-2" variant="tonal" :href="item.file" style="text-transform: unset;">
+                    <v-btn class="mt-2 button" variant="tonal" :href="item.file">
                       <font-awesome-icon icon="fa-solid fa-download"></font-awesome-icon>
                       {{ decodeURIComponent(item.file.split('%2F').pop()?.split('?')[0] ?? 'Download') }}
                     </v-btn>
@@ -188,6 +181,16 @@
     </v-container>
   </div>
 </template>
+
+<style scoped lang="scss">
+  .gray-text {
+    color: gray;
+  }
+
+  .button {
+    text-transform: unset;
+  }
+</style>
 
 <script lang="ts" setup>
 import HeaderComponent from '@/components/home/HeaderComponent.vue'

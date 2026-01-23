@@ -1,14 +1,7 @@
 <template>
-<div style="top: 72px; margin-bottom: 72px; position: relative;">
+<div class="container">
   <v-container>
-    <div :style="{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      alignContent: 'center',
-    }">
+    <div class="global-container">
         <div class="text-h4 font-weight-medium">
             <font-awesome-icon icon="fa-solid fa-warning"/>
             {{ 'Page Not Found' }}
@@ -35,7 +28,18 @@
   </div>
 </template>
 
+<style scoped lang="scss" >
+.global-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+}
+</style>
+
 <script lang="ts" setup>
+import '@/styles/global.scss'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()

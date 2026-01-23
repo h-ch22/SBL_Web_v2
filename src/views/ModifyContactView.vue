@@ -1,7 +1,7 @@
 <template>
-  <div style="top: 72px; margin-bottom: 72px; position: relative;">
+  <div class="container">
     <v-container>
-      <div :style="{ minHeight: '100vh' }">
+      <div class="global-container">
         <div>
           <HeaderComponent
             :title="'Modify Contact'"
@@ -81,6 +81,7 @@
 </template>
 
 <script lang="ts" setup>
+import '@/styles/global.scss'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import ImageUploader from 'quill-image-uploader'
 import HeaderComponent from '@/components/home/HeaderComponent.vue'

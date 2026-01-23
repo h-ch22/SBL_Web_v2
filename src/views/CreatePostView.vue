@@ -1,7 +1,7 @@
 <template>
-  <div style="top: 72px; margin-bottom: 72px; position: relative;">
+  <div class="container">
     <v-container>
-      <div :style="{ minHeight: '100vh' }">
+      <div class="global-container">
         <div>
           <HeaderComponent
             :title="isEditMode ? 'Modify Post' : 'Create New Post'"
@@ -78,6 +78,8 @@
 
 <script lang="ts" setup>
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import '@/styles/global.scss'
+
 import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import { firestore as db, storage } from '@/main'
 import { onMounted, ref, computed, watch } from 'vue'

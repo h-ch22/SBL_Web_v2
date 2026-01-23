@@ -1,7 +1,7 @@
 <template>
-  <div style="top: 72px; margin-bottom: 72px; position: relative;">
+  <div class="container">
     <v-container>
-      <div :style="{ minHeight: '100vh' }">
+      <div class="global-container">
         <div>
           <HeaderComponent
             :title="'Members'"
@@ -12,55 +12,46 @@
           />
         </div>
 
-        <div
-          :style="{
-            display: 'flex',
-            flexDirection: 'row',
-            overflowX: 'auto',
-          }">
-            <div
-              class="ml-2"
-              v-for="option in options"
-              :key="option">
-              <v-chip
-                v-if="selectedOption === option && searchText === ''"
-                  prepend-icon="mdi-check"
-                  variant="tonal"
-                  color="primary"
-                  class="rounded-pill">
-                {{ option }}
-              </v-chip>
-
-              <v-chip
-                v-else
-                @click="selectedOption = option"
+        <div class="header-container">
+          <div
+            class="ml-2 chips-container"
+            v-for="option in options"
+            :key="option"
+          >
+            <v-chip
+              v-if="selectedOption === option && searchText === ''"
+                prepend-icon="mdi-check"
                 variant="tonal"
-                class="rounded-pill"
-                :disabled="searchText !== ''"
-                >
-                {{ option }}
-              </v-chip>
+                color="primary"
+                class="rounded-pill">
+              {{ option }}
+            </v-chip>
+
+            <v-chip
+              v-else
+              @click="selectedOption = option"
+              variant="tonal"
+              class="rounded-pill"
+              :disabled="searchText !== ''"
+            >
+              {{ option }}
+            </v-chip>
             </div>
         </div>
 
         <v-text-field
-          class="mt-5"
+          class="mt-5 search-bar"
           v-model="searchText"
           label="Search Members"
           color="primary"
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
-          :style="{ maxWidth: '100vw' }"
           clear-icon="mdi-close"
           clearable
           @click:clear="searchText = ''"
         ></v-text-field>
 
-        <div
-          :style="{
-            display: 'flex',
-            justifyContent: 'center'
-          }">
+        <div class="members-container">
             <CommonProgress v-if="isLoading" />
 
             <div v-else-if="!isLoading && filteredMembers.length === 0" class="mt-5">
@@ -94,7 +85,7 @@
                           height="200px"
                         />
 
-                      <div :style="{ alignContent: 'center', justifyContent: 'center' }">
+                      <div class="name-container">
                           <v-chip variant="outlined" class="rounded-xl" color="primary">
                             {{ member.degree }}
                           </v-chip>
@@ -185,12 +176,13 @@
             </v-row>
         </div>
       </div>
+    </v-container>
 
-    <v-dialog v-if="showWindow && selectedMember !== null" v-model="showWindow" :style="{ backdropFilter: 'blur(5px)' }">
-      <v-card class="pa-5">
-        <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; z-index: 1000;">
-          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <div class="rounded-xl pa-2" style="max-width: 70%; word-break: break-word; white-space: pre-wrap; backdrop-filter: blur(5px);">
+    <v-dialog v-if="showWindow && selectedMember !== null" v-model="showWindow" class="dialog">
+      <v-card class="pa-5 card">
+        <v-card-title class="rounded-xl title-container">
+          <div class="window-header-container">
+            <div class="rounded-xl pa-2 title-container--left">
               <v-chip variant="outlined" class="rounded-xl mr-2" color="primary">
                 {{ selectedMember.degree }}
               </v-chip>
@@ -198,7 +190,7 @@
               {{ selectedMember.name }}
             </div>
 
-            <v-btn style="margin-left: 16px; flex-shrink: 0;" color="red" variant="tonal" @click="selectedMember = null; showWindow = false;">
+            <v-btn class="title-container--right" color="red" variant="tonal" @click="selectedMember = null; showWindow = false;">
               <font-awesome-icon icon="fa-solid fa-xmark"/>
             </v-btn>
           </div>
@@ -244,16 +236,17 @@
           <div>
             <v-btn
               v-if="selectedMember.website !== ''"
-              style="text-transform: unset;"
-              class="mt-2 mr-2"
+              class="mt-2 mr-2 text-button"
               variant="tonal"
               :href="selectedMember.website">
               <font-awesome-icon icon="fa-solid fa-link" class="mr-2"/>
+
               {{ selectedMember.website }}
             </v-btn>
 
-            <v-btn variant="tonal" class="mt-2" style="text-transform: unset;" @click="router.push({ path: '/publications', query: { author: selectedMember.name } })">
+            <v-btn variant="tonal" class="mt-2 text-button" @click="router.push({ path: '/publications', query: { author: selectedMember.name } })">
               <font-awesome-icon class="mr-2" icon="fa-solid fa-magnifying-glass"/>
+
               {{ 'Find Publications' }}
             </v-btn>
           </div>
@@ -291,10 +284,42 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
-    </v-container>
+  </v-dialog>
   </div>
 </template>
+
+<style scoped lang="scss">
+  .members-container {
+    display: flex;
+    justify-content: center;
+
+    .name-container {
+      align-content: center;
+      justify-content: center;
+    }
+  }
+
+  .title-container {
+    .window-header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+
+      &--left {
+        max-width: 70%;
+        word-break: break-word;
+        white-space: pre-wrap;
+        backdrop-filter: blur(5px);
+      }
+
+      &--right {
+        margin-left: 16px;
+        flex-shrink: 0;
+      }
+    }
+  }
+</style>
 
 <script lang="ts" setup>
 import { firestore as db, storage } from '@/main'
@@ -308,6 +333,7 @@ import { Delta, QuillEditor } from '@vueup/vue-quill'
 import { useAuthStore } from '@/stores/AuthStateStore'
 import { storeToRefs } from 'pinia'
 
+import '@/styles/global.scss'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import CommonProgress from '@/components/common/CommonProgress.vue'

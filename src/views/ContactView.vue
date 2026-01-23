@@ -1,9 +1,7 @@
 <template>
-<div style="top: 72px; margin-bottom: 72px; position: relative;">
+<div class="container">
   <v-container>
-    <div :style="{
-      minHeight: '100vh'
-    }">
+    <div class="global-container">
       <div>
         <HeaderComponent
           :title="'Welcome to SBL'"
@@ -22,22 +20,12 @@
           })"
         ></HeaderComponent>
       </div>
-      <div
-        :style="{
-          display: 'flex',
-          flexDirection: 'row',
-      }">
+      <div class="contents-container">
         <CommonProgress v-if="isLoading" />
 
         <div
             v-else
-            class="mt-5"
-            :style="{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }"
+            class="mt-5 contact-container"
         >
             <v-img :src="contactItem?.image" width="100%" max-width="100%"/>
 
@@ -49,10 +37,9 @@
 
             <v-row class="my-2">
               <v-btn
-                class="mt-2 mr-2"
-                variant="outlined"
                 v-if="contactItem?.tel !== ''"
-                style="text-transform: unset;"
+                class="mt-2 mr-2 action"
+                variant="outlined"
                 @click="copyToClipboard('tel')"
               >
                 {{ isPhoneCopied ? 'Copied!' : contactItem?.tel }}
@@ -61,10 +48,9 @@
               </v-btn>
 
               <v-btn
-                class="mt-2"
-                variant="outlined"
                 v-if="contactItem?.email !== ''"
-                style="text-transform: unset;"
+                class="mt-2 action"
+                variant="outlined"
                 @click="copyToClipboard('email')"
               >
                 {{ isEmailCopied ? 'Copied!' : contactItem?.email }}
@@ -75,7 +61,7 @@
 
             <GoogleMap
               :api-key="apiKey"
-              style="width: 100%; height: 50vh"
+              class="maps"
               :center="coords"
               :zoom=15
               language="en"
@@ -87,16 +73,15 @@
 
             <div
               v-if="contactItem?.address !== ''"
-              class="my-2 px-2"
-              :style="{ display: 'flex', flexDirection: 'row' }">
+              class="my-2 px-2 address-container"
+            >
               {{ contactItem?.address }}
 
               <v-spacer/>
 
               <v-btn
-                class="ml-2"
+                class="ml-2 action"
                 variant="outlined"
-                style="text-transform: unset;"
                 @click="copyToClipboard('address')"
               >
                 <font-awesome-icon v-if="!isAddressCopied" icon="fa-solid fa-clipboard"/>
@@ -110,6 +95,29 @@
   </div>
 </template>
 
+<style scoped lang="scss">
+  .contact-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .action {
+    text-transform: unset;
+  }
+
+  .maps {
+    width: 100%;
+    height: 50vh;
+  }
+
+  .address-container {
+    display: flex;
+    flex-direction: row;
+  }
+</style>
+
 <script lang="ts" setup>
 import HeaderComponent from '@/components/home/HeaderComponent.vue'
 import { firestore as db } from '@/main'
@@ -119,8 +127,10 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Delta, QuillEditor } from '@vueup/vue-quill'
 import { GoogleMap, Marker, MarkerCluster } from 'vue3-google-map'
-import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import CommonProgress from '@/components/common/CommonProgress.vue'
+
+import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import '@/styles/global.scss'
 
 const contactItem = ref<Contact|undefined>(undefined)
 const isLoading = ref(true)

@@ -43,7 +43,7 @@
     </v-card>
 </template>
 
-<style>
+<style scoped lang="scss">
 .window-title-container {
     word-break: break-word;
     white-space: pre-wrap;

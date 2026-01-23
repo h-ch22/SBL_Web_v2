@@ -1,21 +1,6 @@
 <template>
-<div
-    class="text-h4 font-weight-medium "
-    :style="{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    }">
-
-    <div :style="{
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      verticalAlign: 'middle',
-      alignContent: 'center'
-    }">
+<div class="text-h4 font-weight-medium header-container">
+    <div class="header-container--left">
         <v-btn
             v-if="props.showLeadingBtn"
             variant="text"
@@ -54,6 +39,24 @@
 
 <v-divider class="mt-2 mb-2"/>
 </template>
+
+<style scoped lang="scss">
+  .header-container {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    &--left {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      vertical-align: middle;
+      align-content: center;
+    }
+  }
+</style>
 
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/AuthStateStore'

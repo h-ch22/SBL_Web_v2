@@ -1,9 +1,7 @@
 <template>
-<div style="top: 72px; margin-bottom: 72px; position: relative;">
+<div class="container">
   <v-container>
-    <div :style="{
-      minHeight: '100vh'
-    }">
+    <div class="global-container">
       <div>
         <HeaderComponent
           :title="selectedOption"
@@ -12,12 +10,7 @@
         ></HeaderComponent>
       </div>
 
-      <div
-        :style="{
-          display: 'flex',
-          flexDirection: 'row',
-          overflowX: 'auto',
-        }">
+      <div class="options-container">
           <div
             class="ml-2"
             v-for="option in options"
@@ -42,12 +35,7 @@
           </div>
       </div>
 
-        <div
-          :style="{
-            width: '100vw',
-            display: 'flex',
-            flexDirection: 'row',
-        }">
+        <div class="contents-container">
           <CommonProgress v-if="isLoading" />
 
           <div v-else-if="selectedOption === 'Projects'" class="mt-5">
@@ -63,7 +51,7 @@
             </div>
 
             <div v-for="project in projectList" :key="project.id">
-              <v-card class="mt-2 pa-2" variant="outlined" :style="{ maxWidth: '90vw' }">
+              <v-card class="mt-2 pa-2 card" variant="outlined">
                 <v-card-title style="word-break: break-word; white-space: normal;">
                   {{ project.contents }}
                 </v-card-title>
@@ -74,12 +62,12 @@
                 </v-card-subtitle>
 
                 <v-card-text class="px-7">
-                  <v-row :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center' }">
+                  <v-row class="project-row">
                     <font-awesome-icon icon="fa-solid fa-building" class="mr-1"/>
                     {{ project.agency }}
                   </v-row>
 
-                  <v-row :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center' }">
+                  <v-row class="project-row">
                     <font-awesome-icon icon="fa-solid fa-money-bill" class="mr-1"/>
                     {{ project.budget.includes(',') ? project.budget : project.budget.replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} {{ project.budgetUnit }}
                   </v-row>
@@ -129,9 +117,9 @@
         </div>
       </div>
 
-      <v-dialog v-model="showAddModal" :style="{ backdropFilter: 'blur(5px)' }">
-        <v-card class="pa-4">
-            <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
+      <v-dialog v-model="showAddModal" class="dialog">
+        <v-card class="pa-4 card">
+            <v-card-title class="rounded-xl title-container" >
               <v-row :style="{ alignItems: 'center', justifyContent: 'center', 'verticalAlign': 'middle' }">
                 {{ isEditMode ? 'Edit Project' : 'Add Project' }}
                 <v-spacer/>
@@ -141,7 +129,7 @@
               </v-row>
             </v-card-title>
 
-            <v-card-contents>
+            <v-card-contents class="card-contents">
               <v-text-field
                 class="mt-4"
                 v-model="newProjectModel.contents"
@@ -151,8 +139,7 @@
                 prepend-icon="mdi-format-title"
                 clear-icon="mdi-close"
                 clearable
-                @click:clear="newProjectModel.contents = ''"
-                :style="{ maxWidth: '100vw' }"/>
+                @click:clear="newProjectModel.contents = ''"/>
 
               <v-text-field
                 class="mt-4"
@@ -163,10 +150,9 @@
                 prepend-icon="mdi-office-building"
                 clear-icon="mdi-close"
                 clearable
-                @click:clear="newProjectModel.agency = ''"
-                :style="{ maxWidth: '100vw' }"/>
+                @click:clear="newProjectModel.agency = ''"/>
 
-              <v-row class="mt-4" :style="{ maxWidth: '100vw', justifyContent: 'center' }">
+              <v-row class="mt-4 budget-row">
                 <v-text-field
                   v-model="newProjectModel.budget"
                   label="Budget"
@@ -177,10 +163,10 @@
                   clear-icon="mdi-close"
                   clearable
                   @click:clear="newProjectModel.budget = ''"
-                  :style="{ maxWidth: '65vw' }"/>
+                  class="budget-field"/>
 
                 <v-text-field
-                  class="ml-2"
+                  class="ml-2 budget-unit-field"
                   v-model="newProjectModel.budgetUnit"
                   label="Budget Unit"
                   variant="outlined"
@@ -188,8 +174,7 @@
                   prepend-icon="mdi-currency-usd"
                   clear-icon="mdi-close"
                   clearable
-                  @click:clear="newProjectModel.budgetUnit = ''"
-                  :style="{ maxWidth: '25vw' }"/>
+                  @click:clear="newProjectModel.budgetUnit = ''"/>
               </v-row>
 
               <v-row class="mt-2 pa-4">
@@ -200,8 +185,7 @@
                   variant="outlined"
                   color="primary"
                   prepend-icon="mdi-calendar"
-                  readonly
-                  :style="{ maxWidth: '100vw' }"/>
+                  readonly/>
 
                 <v-btn @click="
                 {
@@ -221,8 +205,7 @@
                   variant="outlined"
                   color="primary"
                   prepend-icon="mdi-calendar"
-                  readonly
-                  :style="{ maxWidth: '100vw' }"/>
+                  readonly/>
 
                 <v-btn @click="
                 {
@@ -234,10 +217,10 @@
                 </v-btn>
               </v-row>
 
-              <v-dialog v-model="showDatePicker" :style="{ backdropFilter: 'blur(5px)' }">
+              <v-dialog v-model="showDatePicker" class="dialog">
                 <v-card class="pa-4">
-                  <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
-                    <v-row :style="{ display: 'flex', alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle' }">
+                  <v-card-title class="rounded-xl date-picker-title-container">
+                    <v-row class="date-picker-container">
                       {{ datePickerType === 'begin' ? 'Select Begin Date' : 'Select End Date' }}
                       <v-spacer/>
                       <v-btn variant="text" color="red" @click="showDatePicker = false">
@@ -246,7 +229,7 @@
                     </v-row>
                   </v-card-title>
 
-                  <v-card-contents class="my-5" :style="{ display: 'flex', alignItems: 'center', justifyContent: 'center', alignContent: 'center' }">
+                  <v-card-contents class="my-5 row">
                     <v-date-picker v-model="selectedDate" show-adjacent-months></v-date-picker>
                   </v-card-contents>
 
@@ -281,10 +264,10 @@
         </v-card>
       </v-dialog>
 
-      <v-dialog v-model="showResearchModal" :style="{ backdropFilter: 'blur(5px)' }">
-        <v-card class="pa-4">
-            <v-card-title class="rounded-xl" style="word-break: break-word; white-space: pre-wrap; position: sticky; top: 0; background-color: transparent; backdrop-filter: blur(5px); z-index: 1000;">
-              <v-row :style="{ alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle' }">
+      <v-dialog v-model="showResearchModal" class="dialog">
+        <v-card class="pa-4 card">
+            <v-card-title class="rounded-xl title-container">
+              <v-row class="row">
                 {{ 'Modify Research' }}
                 <v-spacer/>
                 <v-btn variant="text" color="red" @click="showResearchModal = false" :disabled="isUploading">
@@ -295,11 +278,11 @@
 
             <v-card-contents class="mt-4">
               <QuillEditor
+                class="editor"
                 v-model:content="newResearchModel"
                 toolbar="full"
                 :modules="modules"
-                :options="{ theme: 'bubble' }"
-                :style="{ maxHeight: '70vh', overflowY: 'auto' }"/>
+                :options="{ theme: 'bubble' }"/>
             </v-card-contents>
 
             <v-card-actions>
@@ -323,10 +306,71 @@
   </div>
 </template>
 
-<style scoped>
-* /deep/ .v-list-item__subtitle {
+<style scoped lang="scss">
+.options-container {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+}
+
+.contents-container {
+  width: 100vw;
+}
+
+.card {
+  max-width: 90vw;
+
+  .budget-row {
+    max-width: 100vw;
+    justify-content: center;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .project-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.date-picker-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.date-picker-title-container {
+    word-break: break-word;
+    white-space: pre-wrap;
+    position: sticky;
+    top: 0;
+    background-color: transparent;
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    justify-content: center;
+}
+
+.budget-field {
+  max-width: 65vw;
+}
+
+.budget-unit-field {
+  max-width: 25vw;
+}
+
+.editor {
+  max-height: 70vh;
+  overflow-x: auto;
+}
+</style>
+
+<style>
+  * /deep/ .v-list-item__subtitle {
   white-space: normal;
-}</style>
+}
+</style>
 
 <script lang="ts" setup>
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
