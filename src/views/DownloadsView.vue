@@ -255,6 +255,28 @@ function deleteItem (item: Download) {
   }
 }
 
+function getPrivateDownloads () {
+  getDocs(query(collection(db, 'Private_Downloads'), orderBy('date', 'desc')))
+    .then((querySnapshot) => {
+      downloadsList.value.push(...querySnapshot.docs.map((doc) => ({
+        ...(doc.data() as Download),
+        id: doc.id,
+        contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
+        showContents: false,
+        isPrivate: true
+      })))
+
+      downloadsList.value.sort((a, b) => (a.date < b.date ? 1 : -1))
+      filteredList.value = downloadsList.value
+    })
+    .catch((e: Error) => {
+      console.log(e.message)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+
 onMounted(() => {
   getDocs(query(collection(db, 'Downloads'), orderBy('date', 'desc')))
     .then((querySnapshot) => {
@@ -267,6 +289,10 @@ onMounted(() => {
       }))
 
       filteredList.value = downloadsList.value
+
+      if (isSignedIn.value) {
+        getPrivateDownloads()
+      }
     })
     .catch((e: Error) => {
       console.log(e.message)
@@ -278,25 +304,7 @@ onMounted(() => {
 
 watch(() => isSignedIn.value, () => {
   if (isSignedIn.value) {
-    getDocs(query(collection(db, 'Private_Downloads'), orderBy('date', 'desc')))
-      .then((querySnapshot) => {
-        downloadsList.value.push(...querySnapshot.docs.map((doc) => ({
-          ...(doc.data() as Download),
-          id: doc.id,
-          contentsDelta: doc.data().contents === '' || doc.data().contents === undefined ? undefined : new Delta(JSON.parse(doc.data().contents || '{}')),
-          showContents: false,
-          isPrivate: true
-        })))
-
-        downloadsList.value.sort((a, b) => (a.date < b.date ? 1 : -1))
-        filteredList.value = downloadsList.value
-      })
-      .catch((e: Error) => {
-        console.log(e.message)
-      })
-      .finally(() => {
-        isLoading.value = false
-      })
+    getPrivateDownloads()
   } else {
     downloadsList.value = downloadsList.value.filter(item => !item.isPrivate)
     filteredList.value = filteredList.value.filter(item => !item.isPrivate)
